@@ -1,0 +1,21 @@
+<view class="container">
+  <!-- 用户信息头部 -->
+  <view class="user-header">
+    <image class="user-avatar" src="{{userInfo.avatarUrl}}" />
+    <view class="user-info">
+      <text class="user-name">{{userInfo.nickName}}</text>
+      <text class="user-score">欢迎加入房间</text>
+    </view>
+  </view>
+
+  <!-- 加入房间 -->
+  <view class="leaderboard">
+    <input class="input" placeholder="请输入邀请码" bindinput="onInputCode" />
+    <button class="join-button" bindtap="onJoinRoom">加入房间</button>
+
+   
+  </view>
+  <view class="button-group">
+      <button class="checkin-button" bindtap="onCreateRoom">创建房间</button>
+    </view>
+</view>
