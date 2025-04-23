@@ -1,5 +1,5 @@
 <view class="container">
-  <!-- 用户信息头部 -->
+  <!-- 头部 -->
   <view class="user-header">
     <image class="user-avatar" src="{{userInfo.avatarUrl}}" />
     <view class="user-info">
@@ -12,10 +12,46 @@
   <view class="leaderboard">
     <input class="input" placeholder="请输入邀请码" bindinput="onInputCode" />
     <button class="join-button" bindtap="onJoinRoom">加入房间</button>
+  </view>
+  <!-- 全部房间列表 -->
+  <view class="room-list">
+    <view class="section-title">全部房间</view>
+    <scroll-view scroll-y class="room-block">
+      <block wx:for="{{roomList}}" wx:key="code">
+        <view class="room-item">
+          <view class="room-info">
+            <text class="room-name">{{item.name || '未命名房间'}}</text>
+            <text class="room-type">类型：{{item.type || '默认'}}</text>
+            <text class="room-users">人数：{{item.users.length}}</text>
+          </view>
+          <button class="join-button" bindtap="onJoinRoomFromList" data-code="{{item.code}}">加入</button>
+        </view>
+      </block>
+    </scroll-view>
 
-   
   </view>
   <view class="button-group">
-      <button class="checkin-button" bindtap="onCreateRoom">创建房间</button>
+    <button class="checkin-button" bindtap="openCreateModal">创建房间</button>
+  </view>
+
+  <!-- 创建房间弹窗 -->
+  <view wx:if="{{showCreateModal}}" class="modal-overlay" catchtap="closeCreateModal">
+    <view class="modal-popup" catchtap="stopTap">
+      <view class="modal-header">创建房间</view>
+
+      <view class="modal-body">
+        <input placeholder="请输入房间名称" bindinput="onInputRoomName" class="input" />
+
+        <picker mode="selector" range="{{roomTypes}}" bindchange="onRoomTypeChange">
+          <view class="picker">{{selectedRoomType || '请选择房间类型'}}</view>
+        </picker>
+      </view>
+
+      <view class="modal-footer">
+        <button class="footer-on-button" bindtap="closeCreateModal">取消</button>
+        <button class="footer-button" bindtap="onCreateRoom">确认</button>
+        
+      </view>
     </view>
+  </view>
 </view>

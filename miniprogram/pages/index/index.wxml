@@ -2,7 +2,11 @@
 <view class="container">
   <!-- 新增个人信息头部 -->
   <view class="user-header">
-    <image class="user-avatar" src="{{userInfo.avatarUrl || '/assets/images/default-avatar.jpg'}}" mode="aspectFill"></image>
+    <image class="user-avatar" 
+       src="{{userInfo.avatarUrl || '/assets/images/default-avatar.jpg'}}" 
+       mode="aspectFill" 
+       bindtap="onAvatarTap"></image>
+
     <view class="user-info">
       <text class="user-name">{{userInfo.nickName || '微信用户'}}</text>
       <text class="user-score">未设置分数</text>
@@ -34,3 +38,18 @@
   </view>
   <button class="checkin-button" bindtap="navigateToCheckins">今日打卡</button>
 </view>
+<view wx:if="{{isSidebarVisible}}" class="sidebar-overlay" catchtap="closeSidebar">
+  <view class="sidebar-popup {{sidebarAnimClass}}" catchtap="stopTap">
+    <view class="sidebar-header">个人中心</view>
+    <view class="sidebar-body">
+      <text>昵称：{{userInfo.nickName || '微信用户'}}</text>
+    </view>
+    <view class="sidebar-body" bindtap="navigateToRoom">
+      <text>退出房间</text>
+    </view>
+    <view class="sidebar-body" bindtap="navigateToRoom">
+      <text>修改资料</text>
+    </view>
+  </view>
+</view>
+

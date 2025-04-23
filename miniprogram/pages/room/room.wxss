@@ -1,6 +1,6 @@
 /* pages/room/room.wxss */
 .input {
-  width: 100%;
+  /* width: 100%; */
   padding: 12px;
   font-size: 16px;
   border-radius: 8px;
@@ -8,6 +8,38 @@
   border: 1px solid #ddd;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   background: #fff;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+
+.modal-popup {
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 20rpx;
+  width: 80%;
+}
+
+.modal-header {
+  font-weight: bold;
+  font-size: 32rpx;
+  margin-bottom: 20rpx;
+}
+
+.picker {
+  border: 1px solid #ccc;
+  padding: 20rpx;
+  margin-top: 20rpx;
+  border-radius: 10rpx;
+}
+
+.modal-footer {
+  margin-top: 20px;
+  display: flex;
 }
 
 .button-group {
@@ -252,6 +284,29 @@
   padding: 10px 20px;
   border-radius: 20px;
 }
+.footer-button {
+  width: 30%;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  border: none;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 15px;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+}
+.footer-on-button {
+  width: 30%;
+
+  background: linear-gradient(135deg, #cb3611 0%, #fcf825 100%);
+  border: none;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 15px;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+}
 
 .user-item:nth-child(1) {
   animation-delay: 0.1s;
@@ -271,4 +326,57 @@
 
 .user-item:nth-child(5) {
   animation-delay: 0.5s;
+}
+/* container 已有样式就不重复写了 */
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 20rpx 30rpx 10rpx;
+  color: #333;
+}
+
+.room-list {
+  width: 100%;
+}
+.room-block {
+  height: 50vh;
+  overflow: hidden;
+}
+
+.room-item {
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.room-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.room-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.room-type,
+.room-users {
+  font-size: 14px;
+  color: #888;
+  margin-top: 6rpx;
+}
+
+.join-button {
+  background-color: #007aff;
+  color: white;
+  padding: 10rpx 24rpx;
+  font-size: 14px;
+  border-radius: 8rpx;
 }

@@ -12,23 +12,32 @@ function generateCode(length = 6) {
 }
 
 exports.main = async (event) => {
-  const { openid, userName, avatarUrl } = event // 可传入创建者头像和昵称
+  const { openid, userName, avatarUrl, roomName, roomType } = event
+
+  if (!openid || !roomName || !roomType) {
+    return {
+      success: false,
+      message: '参数缺失'
+    }
+  }
 
   const code = generateCode()
-
+console.log('roomName',roomName);
   try {
     const roomRes = await db.collection('room').add({
       data: {
         code,
+        name: roomName,           // ✅ 新增字段：房间名称
+        type: roomType,           // ✅ 新增字段：房间类型
         createTime: new Date(),
         createdBy: openid,
         users: [
           {
             openid,
-            userName: userName || '',     // 创建者名称（可选）
-            avatarUrl: avatarUrl || '',   // 创建者头像（可选）
+            userName: userName || '',
+            avatarUrl: avatarUrl || '',
             score: 0,
-            isOwner: true,                // ✅ 设为房主
+            isOwner: true,
             joinTime: new Date()
           }
         ]

@@ -2,6 +2,8 @@ const db = wx.cloud.database()
 const app = getApp();
 Page({
   data: {
+    isSidebarVisible: false, // 控制侧边栏弹窗显示
+    sidebarAnimClass: '',
     userInfo: null,
     stats: {
       users: 0,
@@ -19,7 +21,31 @@ Page({
     this.getUserData(app.globalData.openid)
     this.loadLeaderboard();
   },
+  onAvatarTap() {
+    this.setData({
+      isSidebarVisible: true
+    });
 
+    setTimeout(() => {
+      this.setData({
+        sidebarAnimClass: 'slide-in'
+      });
+    }, 20); // 给一点延迟，保证 class 变更生效
+  },
+
+  closeSidebar() {
+    this.setData({
+      sidebarAnimClass: 'slide-out'
+    });
+
+    setTimeout(() => {
+      this.setData({
+        isSidebarVisible: false
+      });
+    }, 300); // 和动画时长一致
+  },
+
+  stopTap() {}, // 阻止冒泡,
   loadLeaderboard() {
     // wx.getStorageSync('leaderboard') ||
     let leaderboard =  [
@@ -126,6 +152,12 @@ Page({
   navigateToCheckins() {
     wx.navigateTo({
       url: '/pages/checkins/checkins'
+    });
+  }
+  ,
+  navigateToRoom() {
+    wx.navigateTo({
+      url: '/pages/room/room'
     });
   }
 });
