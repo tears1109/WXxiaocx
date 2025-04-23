@@ -1,0 +1,1 @@
+<button open-type="getUserInfo" bindgetuserinfo="onGetUserInfo">微信一键登录</button>

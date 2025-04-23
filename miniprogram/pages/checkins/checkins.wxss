@@ -1,0 +1,125 @@
+/* page.wxss */
+.container {
+  padding: 20px;
+  width: 100%;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.back-button {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 15px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+/* 状态颜色 */
+.checkin-item.state-0 {
+  border-left: 4px solid #ff4d4f;
+}
+.checkin-item.state-1 {
+  border-left: 4px solid #1890ff;
+}
+.checkin-item.state-2 {
+  border-left: 4px solid #52c41a;
+}
+.checkin-list {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.checkin-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid #eee;
+  justify-content: center;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 15px;
+  border: 2px solid #f0f2f5;
+}
+
+.name {
+  flex: 1;
+  font-size: 16px;
+  color: #333;
+}
+
+.time {
+  font-size: 14px;
+  color: #999;
+}
+
+/* 模拟数据使用的占位头像样式 */
+.avatar {
+  background-color: #f0f2f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 18px;
+}
+
+.state-text {
+  font-size: 12px;
+  /* margin-left: 18px; */
+  margin-right: 18px;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+/* 状态颜色类 */
+/* 三种状态渐变色 */
+.state-error {
+  background: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%);
+  box-shadow: 0 4px 8px rgba(255, 94, 98, 0.3);
+}
+
+.state-normal {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  box-shadow: 0 4px 8px rgba(79, 172, 254, 0.3);
+}
+
+.state-success {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  box-shadow: 0 4px 8px rgba(67, 233, 123, 0.3);
+}
+.checkin-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  border: none;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 15px;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+}

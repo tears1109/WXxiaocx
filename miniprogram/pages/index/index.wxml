@@ -1,0 +1,43 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  <block wx:if="{{userInfo}}">
+    <!-- 已登录用户显示的内容 -->
+    <view class="user-header">
+      <image class="user-avatar" src="{{userInfo.avatarUrl || '/assets/images/default-avatar.jpg'}}" mode="aspectFill"></image>
+      <view class="user-info">
+        <text class="user-name">{{userInfo.nickName || '用户'}}</text>
+      </view>
+      <view class="user-rank">
+        <text class="rank-label">我的排名</text>
+      </view>
+    </view>
+
+    <view class="stats">
+      <text class="stats-item">参与人数: {{stats.users}}</text>
+      <text class="stats-item">答题次数: {{stats.attempts}}</text>
+      <text class="stats-item">总分: {{stats.totalScore}}</text>
+    </view>
+    
+    <view class="leaderboard-container">
+      <scroll-view scroll-y class="leaderboard-scroll">
+        <view class="leaderboard">
+          <block wx:for="{{leaderboard}}" wx:key="index">
+            <view class="user-item {{index === 0 ? 'first' : ''}}">
+              <text class="rank">{{index + 1}}</text>
+              <image class="avatar" src="{{item.avatarUrl || '/assets/images/default-avatar.jpg'}}" mode="aspectFill"></image>
+              <text class="name">{{item.nickName}}</text>
+              <text class="score">{{item.score}} 分</text>
+            </view>
+          </block>
+        </view>
+      </scroll-view>
+    </view>
+    
+    <button class="checkin-button" bindtap="navigateToCheckins">今日打卡</button>
+  </block>
+  
+  <block wx:else>
+    <!-- 未登录时的加载状态 -->
+    <view class="loading">加载中...</view>
+  </block>
+</view>
