@@ -4,6 +4,7 @@
     "pages/logs/logs",
     "pages/punchCard/punchCard",
     "pages/checkins/checkins",
+    "pages/room/room",
     "pages/login/login"
   ],
   
