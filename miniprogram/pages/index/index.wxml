@@ -3,9 +3,9 @@
   <view class="fixed-content">
     <!-- 个人信息头部 -->
     <view class="user-header">
-      <image class="user-avatar" src="{{userInfo.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill" bindtap="onAvatarTap"></image>
+      <image class="user-avatar" src="{{roomUser.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill" bindtap="onAvatarTap"></image>
       <view class="user-info">
-        <text class="user-name">{{userInfo.nickName || '微信用户'}}</text>
+        <text class="user-name">{{roomUser.name || '微信用户'}}</text>
         <text class="user-score">总积分: {{userScore}}分</text>
       </view>
       <view class="user-rank">
@@ -15,8 +15,14 @@
     </view>
     <!-- 房间信息 -->
     <view class="room-header" wx:if="{{roomInfo}}">
-      <text class="room-name">{{roomInfo.name || '未命名房间'}}</text>
-      <text class="room-type">{{roomInfo.type}}</text>
+      <view class="room-header-left">
+        <text class="room-name">{{roomInfo.name || '未命名房间'}}</text>
+        <text class="room-type">{{roomInfo.type}}</text>
+      </view>
+      <view class="invite-code-wrapper" bindtap="copyInviteCode">
+        <text class="invite-label">邀请码：</text>
+        <text class="invite-code">{{roomInfo.code}}</text>
+      </view>
     </view>
     <view class="stats">
       <text class="stats-item">参与人数: {{stats.users}}</text>
@@ -49,13 +55,16 @@
   <view class="sidebar-popup {{sidebarAnimClass}}" catchtap="stopTap">
     <view class="sidebar-header">个人中心</view>
     <view class="sidebar-body">
-      <text>昵称：{{userInfo.nickName || '微信用户'}}</text>
+      <text>昵称：{{roomUser.name || '微信用户'}}</text>
     </view>
     <view class="sidebar-body" bindtap="navigateToRoom">
       <text>退出房间</text>
     </view>
-    <view class="sidebar-body" bindtap="navigateToRoom">
+    <view class="sidebar-body" bindtap="navigateToProfile">
       <text>修改资料</text>
+    </view>
+    <view class="sidebar-body" bindtap="handleLogout">
+      <text>退出登录</text>
     </view>
   </view>
 </view>

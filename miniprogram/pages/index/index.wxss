@@ -23,8 +23,8 @@
 }
 
 .user-avatar {
-  width: 120rpx;
-  height: 120rpx;
+  width: 140rpx;
+  height: 140rpx;
   border-radius: 50%;
   margin-right: 24rpx;
   border: 4rpx solid rgba(106, 17, 203, 0.1);
@@ -35,14 +35,14 @@
 }
 
 .user-name {
-  font-size: 36rpx;
+  font-size: 44rpx;
   font-weight: 600;
   color: #333;
   margin-bottom: 8rpx;
 }
 
 .user-score {
-  font-size: 28rpx;
+  font-size: 36rpx;
   color: #666;
 }
 
@@ -55,19 +55,22 @@
 
 .rank-label {
   display: block;
-  font-size: 24rpx;
+  font-size: 32rpx;
   color: #999;
   margin-bottom: 4rpx;
 }
 
 .rank-value {
-  font-size: 32rpx;
+  font-size: 40rpx;
   font-weight: 600;
   color: #6a11cb;
 }
 
 /* 房间信息 */
 .room-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background: white;
   padding: 24rpx;
   border-radius: 16rpx;
@@ -76,7 +79,7 @@
 }
 
 .room-name {
-  font-size: 32rpx;
+  font-size: 40rpx;
   font-weight: 600;
   color: #333;
   margin-bottom: 8rpx;
@@ -84,10 +87,31 @@
 
 .room-type {
   display: inline-block;
-  font-size: 24rpx;
+  font-size: 32rpx;
   color: #666;
   background: #f8f9fd;
   padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+/* 新增：邀请码样式 */
+.invite-code-wrapper {
+  display: flex;
+  align-items: center;
+  margin-top: 12rpx;
+}
+
+.invite-label {
+  font-size: 32rpx;
+  color: #333;
+  margin-right: 8rpx;
+}
+
+.invite-code {
+  font-size: 32rpx;
+  color: #6a11cb;
+  background: #f8f9fd;
+  padding: 6rpx 12rpx;
   border-radius: 8rpx;
 }
 
@@ -106,26 +130,30 @@
 .stats-item {
   text-align: center;
   color: white;
-  font-size: 28rpx;
+  font-size: 36rpx;
   text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
 }
 
 /* 可滚动内容区域 */
 .scrollable-content {
   flex: 1;
+  display: flex;
   padding: 0 24rpx;
 }
 
 .leaderboard-scroll {
-  height: 100%;
-}
-
-/* 排行榜 */
-.leaderboard {
+  display: flex;
+  height: 60vh;
+  overflow: hidden;
   background: white;
   border-radius: 16rpx;
   padding: 24rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 排行榜 */
+.leaderboard {
+ 
 }
 
 .user-item {
@@ -154,8 +182,8 @@
 }
 
 .rank {
-  width: 48rpx;
-  height: 48rpx;
+  width: 56rpx;
+  height: 56rpx;
   background: #f8f9fd;
   border-radius: 50%;
   display: flex;
@@ -164,7 +192,7 @@
   margin-right: 16rpx;
   font-weight: 600;
   color: #666;
-  font-size: 24rpx;
+  font-size: 32rpx;
 }
 
 .user-item.first .rank {
@@ -189,14 +217,14 @@
 }
 
 .name {
-  font-size: 28rpx;
+  font-size: 36rpx;
   color: #333;
   font-weight: 500;
   margin-bottom: 4rpx;
 }
 
 .attempts {
-  font-size: 24rpx;
+  font-size: 32rpx;
   color: #666;
 }
 
@@ -206,7 +234,7 @@
 }
 
 .score {
-  font-size: 32rpx;
+  font-size: 40rpx;
   font-weight: 600;
   color: #666;
 }
@@ -228,10 +256,10 @@
   right: 40rpx;
   background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
   border: none;
-  font-size: 28rpx;
+  font-size: 36rpx;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
   color: white;
-  padding: 20rpx 40rpx;
+  padding: 24rpx 48rpx;
   border-radius: 40rpx;
 }
 
@@ -269,7 +297,7 @@
 
 .sidebar-header {
   padding: 32rpx;
-  font-size: 36rpx;
+  font-size: 44rpx;
   font-weight: 600;
   color: #333;
   border-bottom: 2rpx solid #f0f2f5;
@@ -277,7 +305,7 @@
 
 .sidebar-body {
   padding: 24rpx 32rpx;
-  font-size: 28rpx;
+  font-size: 36rpx;
   color: #333;
   border-bottom: 2rpx solid #f0f2f5;
 }

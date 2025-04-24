@@ -11,12 +11,59 @@ Page({
     code: '',
     userInfo: {}, // 可通过 wx.getUserProfile 获取或全局 app.userInfo
     openid: app.globalData.openid,   // 登录后获取
+    isSidebarVisible: false,
+    sidebarAnimClass: ''
   },
 
   onLoad() {
     this.getUserData(app.globalData.openid);
     this.queryRoom();
   },
+  
+  // 处理头像点击事件，显示侧边栏
+  onAvatarTap() {
+    this.setData({
+      isSidebarVisible: true
+    });
+
+    setTimeout(() => {
+      this.setData({
+        sidebarAnimClass: 'slide-in'
+      });
+    }, 20);
+  },
+
+  // 关闭侧边栏
+  closeSidebar() {
+    this.setData({
+      sidebarAnimClass: 'slide-out'
+    });
+
+    setTimeout(() => {
+      this.setData({
+        isSidebarVisible: false
+      });
+    }, 300);
+  },
+  
+  // 阻止事件冒泡
+  stopTap() {
+    // 防止点击侧边栏内容时关闭侧边栏
+  },
+  
+  // 导航到个人资料页
+  navigateToProfile() {
+    wx.navigateTo({
+      url: '/pages/profile/profile',
+    });
+    this.closeSidebar();
+  },
+  
+  // 处理退出登录
+  handleLogout() {
+    app.logout();
+  },
+
   openCreateModal() {
     this.setData({ showCreateModal: true })
   },
@@ -24,8 +71,6 @@ Page({
   closeCreateModal() {
     this.setData({ showCreateModal: false })
   },
-
-  stopTap() {},
 
   onInputRoomName(e) {
     this.setData({ roomName: e.detail.value })
@@ -152,6 +197,7 @@ Page({
 
       if (res.result.success) {
         wx.showToast({ title: res.result.message, icon: 'success' });
+        this.queryRoom();
         // 这里可以跳转房间页
         // wx.navigateTo({ url: `/pages/room/room?code=${this.data.code}` });
       } else {

@@ -18,6 +18,7 @@ Page({
     isRefreshing: false,
     userScore: 0,    // 用户总分
     userRank: '-',   // 用户排名
+    roomUser: { name: '', avatarUrl: '' },
   },
 
   onLoad(options) {
@@ -30,6 +31,8 @@ Page({
     if (options.id) {
       this.setData({ roomId: options.id });
       this.loadRoomData(options.id);
+    } else {
+      this.navigateToRoom();
     }
   },
 
@@ -69,6 +72,18 @@ Page({
       if (roomRes.data) {
         const users = roomRes.data.users || [];
         
+        // 新增：从全局 users 集合拉取最新头像和昵称
+        let userInfoMap = {};
+        if (users.length > 0) {
+          const openids = users.map(u => u.openid);
+          const userDocs = await db.collection('users').where({
+            _openid: db.command.in(openids)
+          }).get();
+          userDocs.data.forEach(doc => {
+            userInfoMap[doc._openid] = doc.userInfo || {};
+          });
+        }
+        
         // 获取该房间的所有打卡记录
         const checkinsRes = await db.collection('checkins')
           .where({
@@ -85,18 +100,24 @@ Page({
         });
         
         // 处理用户数据
-        const sortedUsers = users.map(user => ({
-          name: user.userName || '未知用户',
-          score: user.score || 0,
-          attempts: userAttempts[user.openid] || 0,
-          avatarUrl: user.avatarUrl,
-          lastCheckin: user.lastCheckin,
-          openid: user.openid
-        })).sort((a, b) => b.score - a.score);
+        const sortedUsers = users.map(user => {
+          const globalInfo = userInfoMap[user.openid] || {};
+          console.log(666,globalInfo.nickName);
+          
+          return {
+            name: globalInfo.nickName || user.userName || '未知用户',
+            avatarUrl: globalInfo.avatarUrl || user.avatarUrl || '',
+            score: user.score || 0,
+            attempts: userAttempts[user.openid] || 0,
+            lastCheckin: user.lastCheckin,
+            openid: user.openid
+          };
+        }).sort((a, b) => b.score - a.score);
 
         // 计算当前用户的排名和分数
         const currentUserIndex = sortedUsers.findIndex(user => user.openid === app.globalData.openid);
         const currentUser = sortedUsers[currentUserIndex];
+        const roomUser = currentUser ? { name: currentUser.name, avatarUrl: currentUser.avatarUrl } : { name: '', avatarUrl: '' };
         const userRank = currentUserIndex !== -1 ? currentUserIndex + 1 : '-';
         const userScore = currentUser ? currentUser.score : 0;
 
@@ -109,7 +130,8 @@ Page({
             users: users.length,
             attempts: checkins.length, // 使用实际的打卡记录总数
             totalScore: users.reduce((sum, user) => sum + (user.score || 0), 0)
-          }
+          },
+          roomUser: roomUser
         });
       }
     } catch (err) {
@@ -181,6 +203,30 @@ Page({
   navigateToRoom() {
     wx.navigateTo({
       url: '/pages/room/room'
+    });
+  },
+
+  // 新增：处理退出登录
+  handleLogout() {
+    app.logout();
+  },
+
+  // 新增：跳转到资料编辑页
+  navigateToProfile() {
+    wx.navigateTo({
+      url: '/pages/profile/profile',
+    });
+  },
+
+  // 新增：复制邀请码
+  copyInviteCode() {
+    const code = this.data.roomInfo && this.data.roomInfo.code;
+    if (!code) return;
+    wx.setClipboardData({
+      data: code,
+      success: () => {
+        wx.showToast({ title: '复制成功', icon: 'success' });
+      }
     });
   },
 

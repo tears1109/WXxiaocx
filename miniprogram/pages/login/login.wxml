@@ -1,17 +1,10 @@
 <view class="container">
   <view class="login-box">
-    <image class="logo" src="/images/logo.png"></image>
+    <view class="app-title">打卡小程序</view>
     <view class="title">欢迎使用</view>
-    
-    <button 
-      wx:if="{{canIUseGetUserProfile}}"
-      class="login-btn"
-      open-type="getUserProfile"
-      bindtap="handleLogin"
-    >
+    <button wx:if="{{canIUseGetUserProfile}}" class="login-btn" open-type="getUserProfile" bindtap="handleLogin">
       微信一键登录
     </button>
-    
     <view wx:else class="tip">请升级微信版本以使用一键登录</view>
   </view>
 </view>

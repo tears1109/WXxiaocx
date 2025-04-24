@@ -80,7 +80,19 @@ App({
               
               // 4. 可选：将用户信息存入云数据库
               this.saveUserToCloud(userInfo, openid)
-                .then(() => resolve({ userInfo, openid }))
+                .then((result) => {
+                  // 检查是否为首次登录并获取随机生成的名称
+                  if (result && result.result && result.result.isNewUser && result.result.userInfo) {
+                    const serverUserInfo = result.result.userInfo;
+                    // 更新本地存储的用户信息，使用服务器生成的随机名字
+                    this.globalData.userInfo = {
+                      ...userInfo,
+                      nickName: serverUserInfo.nickName // 使用服务器生成的随机名字
+                    };
+                    wx.setStorageSync('userInfo', this.globalData.userInfo);
+                  }
+                  resolve({ userInfo: this.globalData.userInfo, openid });
+                })
                 .catch(err => reject(err));
             },
             fail: (err) => {
@@ -109,7 +121,7 @@ App({
       name: 'updateUserInfo',
       data: {
         openid: openid,
-        userInfo: userInfo,
+        loginOnly: true,  // 新增标志，表示只更新登录时间
         lastLoginTime: new Date()
       }
     });

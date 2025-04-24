@@ -24,7 +24,7 @@
 }
 
 .title {
-  font-size: 36rpx;
+  font-size: 44rpx;
   color: #333;
   margin-bottom: 60rpx;
 }
@@ -34,11 +34,21 @@
   background-color: #07C160;
   color: white;
   border-radius: 50rpx;
-  font-size: 32rpx;
+  font-size: 40rpx;
+  padding: 20rpx 0;
 }
 
 .tip {
-  font-size: 28rpx;
+  font-size: 36rpx;
   color: #999;
+  text-align: center;
+}
+
+/* 添加app-title样式 */
+.app-title {
+  font-size: 52rpx;
+  font-weight: bold;
+  color: #6a11cb;
+  margin-bottom: 20rpx;
   text-align: center;
 }
