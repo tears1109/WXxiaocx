@@ -6,7 +6,7 @@ const db = cloud.database()
 const dbCmd = db.command
 
 exports.main = async (event) => {
-  const { code, openid } = event
+  const { code, openid, userName, avatarUrl, isOwner } = event
   if (!code || !openid) {
     return { success: false, message: '参数缺失' }
   }
@@ -32,7 +32,11 @@ exports.main = async (event) => {
       data: {
         users: dbCmd.push({
           openid,
+          userName: userName || '',
+          avatarUrl: avatarUrl || '',
           score: 0,
+          attempts: 0,
+          isOwner: false,
           joinTime: new Date()
         })
       }

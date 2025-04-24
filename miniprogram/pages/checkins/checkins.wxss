@@ -1,90 +1,178 @@
 /* page.wxss */
 .container {
-  padding: 20px;
-  width: 100%;
-  background-color: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+
   min-height: 100vh;
-  box-sizing: border-box;
+  background-color: #f5f6fa;
+  padding: 24rpx;
 }
 
-.header {
+.user-header {
   display: flex;
   align-items: center;
-  margin-bottom: 25px;
+  padding: 32rpx;
+  background: white;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
-.back-button {
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  margin-right: 15px;
+.user-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  margin-right: 24rpx;
+  border: 4rpx solid rgba(106, 17, 203, 0.1);
 }
 
-.title {
-  font-size: 20px;
-  font-weight: bold;
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 36rpx;
+  font-weight: 600;
   color: #333;
 }
-/* 状态颜色 */
-.checkin-item.state-0 {
-  border-left: 4px solid #ff4d4f;
+
+.user-status {
+  font-size: 14px;
+  color: #666;
 }
-.checkin-item.state-1 {
-  border-left: 4px solid #1890ff;
+
+.stats {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  color: white;
+  display: flex;
+  justify-content: space-around;
 }
-.checkin-item.state-2 {
-  border-left: 4px solid #52c41a;
+
+.stats-item {
+  font-size: 14px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
+
+.checkin-button {
+  position: fixed;
+  bottom: 40rpx;
+  right: 40rpx;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  border: none;
+  font-size: 28rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  color: white;
+  padding: 20rpx 40rpx;
+  border-radius: 40rpx;
+}
+
+.checkin-button.checked {
+  background: #ccc;
+  box-shadow: none;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 20px 0 15px;
+}
+
 .checkin-list {
   background: white;
   border-radius: 12px;
-  width: 100%;
   padding: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .checkin-item {
   display: flex;
   align-items: center;
   padding: 12px;
-  margin-bottom: 10px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.checkin-item:last-child {
+  border-bottom: none;
+}
+
+.checkin-item.first {
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
   border-radius: 8px;
-  background: white;
-  border: 1px solid #eee;
+  margin: -2px;
+  padding: 14px;
+}
+
+.rank {
+  width: 24px;
+  height: 24px;
+  background: #f0f2f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  margin-right: 10px;
+  font-size: 12px;
+  color: #666;
+}
+
+.first .rank {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  margin-right: 15px;
-  border: 2px solid #f0f2f5;
+  margin-right: 10px;
 }
 
 .name {
   flex: 1;
-  font-size: 16px;
+  font-size: 14px;
   color: #333;
 }
 
-.time {
+.first .name {
+  color: white;
+}
+
+.score {
   font-size: 14px;
+  color: #666;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.first .score {
+  color: white;
+}
+
+.time {
+  font-size: 12px;
   color: #999;
 }
 
-/* 模拟数据使用的占位头像样式 */
-.avatar {
-  background-color: #f0f2f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #999;
-  font-size: 18px;
+.first .time {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 状态颜色 */
+.checkin-item.state-0 {
+  border-left: 4px solid #ff4d4f;
+}
+
+.checkin-item.state-1 {
+  border-left: 4px solid #1890ff;
+}
+
+.checkin-item.state-2 {
+  border-left: 4px solid #52c41a;
 }
 
 .state-text {
@@ -94,6 +182,7 @@
   padding: 8px 10px;
   border-radius: 10px;
 }
+
 /* 状态颜色类 */
 /* 三种状态渐变色 */
 .state-error {
@@ -110,16 +199,322 @@
   background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
   box-shadow: 0 4px 8px rgba(67, 233, 123, 0.3);
 }
-.checkin-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+
+/* 房间信息样式 */
+.room-info {
+  background: white;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.room-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.room-desc {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 统计信息样式 */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+  padding: 24rpx;
   background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-  border: none;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  margin-right: 15px;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(106, 17, 203, 0.2);
+}
+
+.stat-item {
+  text-align: center;
   color: white;
-  padding: 10px 20px;
-  border-radius: 20px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+/* 打卡按钮样式 */
+.checkin-btn-container {
+  margin: 40rpx 0;
+  text-align: center;
+}
+
+.checkin-btn {
+  width: 240rpx !important;
+  height: 240rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  font-size: 36rpx;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 20rpx rgba(76, 175, 80, 0.3);
+  transition: all 0.3s ease;
+}
+
+.checkin-btn.checked {
+  background: #e0e0e0;
+  box-shadow: none;
+}
+
+/* 排行榜样式 */
+.ranking-container {
+  background: white;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 120rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  flex: 1;
+}
+
+.ranking-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24rpx;
+  padding-left: 16rpx;
+  border-left: 8rpx solid #6a11cb;
+}
+
+.ranking-scroll {
+  max-height: calc(100vh - 500rpx);
+}
+
+.ranking-list {
+  padding: 0 4rpx;
+}
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  border-radius: 12rpx;
+  background: white;
+  border: 2rpx solid #f0f2f5;
+  transition: transform 0.2s ease;
+}
+
+.ranking-item:last-child {
+  margin-bottom: 0;
+}
+
+.ranking-item:active {
+  transform: scale(0.98);
+}
+
+.ranking-item.self {
+  background: rgba(106, 17, 203, 0.05);
+  border-color: rgba(106, 17, 203, 0.1);
+}
+
+.rank-number {
+  width: 48rpx;
+  height: 48rpx;
+  background: #f8f9fd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  font-weight: 600;
+  color: #666;
+  font-size: 24rpx;
+}
+
+.checkin-details {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.checkin-content {
+  font-size: 26rpx;
+  color: #666;
+  margin-top: 8rpx;
+}
+
+.score {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #6a11cb;
+  margin-left: auto;
+}
+
+/* 添加打卡表单样式 */
+.checkin-form {
+  background: #fff;
+  padding: 30rpx;
+  border-radius: 12rpx;
+  margin: 20rpx 0;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.form-item {
+  margin-bottom: 20rpx;
+}
+
+.content-input {
+  width: 100%;
+  height: 200rpx;
+  padding: 20rpx;
+  box-sizing: border-box;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+.duration-input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+/* 更新打卡按钮样式 */
+.checkin-btn {
+  width: 100% !important;
+  height: 88rpx;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 20rpx rgba(76, 175, 80, 0.3);
+  transition: all 0.3s ease;
+  margin-top: 30rpx;
+}
+
+.checkin-btn:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 2rpx 10rpx rgba(76, 175, 80, 0.2);
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  width: 80%;
+  background: white;
+  border-radius: 16rpx;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  padding: 24rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2rpx solid #f0f2f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  font-size: 40rpx;
+  color: #999;
+  padding: 0 16rpx;
+}
+
+.modal-body {
+  padding: 24rpx;
+}
+
+.content-input {
+  width: 100%;
+  height: 200rpx;
+  padding: 16rpx;
+  font-size: 28rpx;
+  border: 2rpx solid #f0f2f5;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.duration-input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 16rpx;
+  font-size: 28rpx;
+  border: 2rpx solid #f0f2f5;
+  border-radius: 8rpx;
+}
+
+.modal-footer {
+  padding: 24rpx;
+  border-top: 2rpx solid #f0f2f5;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: white;
+  font-size: 28rpx;
+  padding: 20rpx 0;
+  border-radius: 8rpx;
+  text-align: center;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20rpx);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

@@ -1,4 +1,12 @@
 /* pages/room/room.wxss */
+/* 页面容器 */
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f6fa;
+}
+
 .input {
   /* width: 100%; */
   padding: 12px;
@@ -9,11 +17,17 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   background: #fff;
 }
+
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 1000;
 }
 
@@ -46,6 +60,7 @@
   display: flex;
   justify-content: space-between;
 }
+
 /* 新增用户头部样式 */
 .user-header {
   width: 100%;
@@ -56,6 +71,31 @@
   border-radius: 12px;
   margin-bottom: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.avatar-r {
+  display: flex;
+  flex-direction: column;
+}
+
+.owner-tag {
+  margin: 8rpx 0;
+  font-size: 12px;
+  color: #ff9500;
+  background-color: #fff6e5;
+  padding: 4rpx 10rpx;
+  border-radius: 8rpx;
+  display: inline-block;
+}
+
+.member-tag {
+  margin: 8rpx 0;
+  font-size: 12px;
+  color: #fafafa;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  padding: 4rpx 10rpx;
+  border-radius: 8rpx;
+  display: inline-block;
 }
 
 .user-avatar {
@@ -274,6 +314,7 @@
   padding: 10px 20px;
   border-radius: 20px;
 }
+
 .join-button {
   background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
   border: none;
@@ -284,6 +325,7 @@
   padding: 10px 20px;
   border-radius: 20px;
 }
+
 .footer-button {
   width: 30%;
   background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
@@ -295,6 +337,7 @@
   padding: 10px 20px;
   border-radius: 20px;
 }
+
 .footer-on-button {
   width: 30%;
 
@@ -327,6 +370,7 @@
 .user-item:nth-child(5) {
   animation-delay: 0.5s;
 }
+
 /* container 已有样式就不重复写了 */
 
 .section-title {
@@ -339,6 +383,7 @@
 .room-list {
   width: 100%;
 }
+
 .room-block {
   height: 50vh;
   overflow: hidden;

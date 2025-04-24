@@ -6,7 +6,7 @@ Page({
     showCreateModal: false,
     roomName: '',
     roomList: [],
-    roomTypes: ['普通房间', '限时房间', '答题房间'],
+    roomTypes: ['计分房间', '排行房间', '普通房间'],
     selectedRoomType: '',
     code: '',
     userInfo: {}, // 可通过 wx.getUserProfile 获取或全局 app.userInfo
@@ -113,8 +113,11 @@ Page({
   
       if (result.success) {
         console.log('当前所在房间:', result.room)
-        this.setData({ roomList: result.room })
-        // 你可以这里赋值到 data 或跳转页面等处理
+        // 按创建时间倒序排序
+        const sortedRooms = result.room.sort((a, b) => {
+          return new Date(b.createTime) - new Date(a.createTime);
+        });
+        this.setData({ roomList: sortedRooms })
       } else {
         wx.showToast({ title: result.message, icon: 'none' })
       }
@@ -138,7 +141,10 @@ Page({
         name: 'joinRoom',
         data: {
           code: this.data.code,
-          openid: app.globalData.openid
+          openid: app.globalData.openid,
+          userName: this.data.userInfo.nickName,
+          avatarUrl: this.data.userInfo.avatarUrl,
+          isOwner: false
         }
       });
 
@@ -153,8 +159,26 @@ Page({
       }
     } catch (err) {
         wx.hideLoading();
-        console.error('加入房间失败：', err); // 打印出错误详情
+        console.error('加入房间失败：', err);
         wx.showToast({ title: '系统错误', icon: 'none' });
+    }
+  },
+
+  // 从房间列表点击加入按钮
+  onJoinRoomFromList(e) {
+    const roomCode = e.currentTarget.dataset.code;
+    const room = e.currentTarget.dataset.room;
+    
+    if (room && room.type === '排行房间') {
+      wx.navigateTo({
+        url: `/pages/index/index?id=${room._id}`
+      });
+    } else {
+      // 其他类型房间的处理逻辑
+      wx.showToast({ title: '加入中...', icon: 'loading' });
+      this.setData({ code: roomCode }, () => {
+        this.onJoinRoom();
+      });
     }
   }
 });

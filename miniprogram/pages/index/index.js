@@ -11,16 +11,118 @@ Page({
       totalScore: 0
     },
     leaderboard: [],
-    isLoggedIn: false
+    isLoggedIn: false,
+    roomId: '', // 添加房间id
+    roomInfo: null, // 添加房间信息
+    isLoading: false,
+    isRefreshing: false,
+    userScore: 0,    // 用户总分
+    userRank: '-',   // 用户排名
   },
 
-  onLoad() {
+  onLoad(options) {
     if (!app.checkLogin()) {
       return;
     }
-    this.getUserData(app.globalData.openid)
-    this.loadLeaderboard();
+    this.getUserData(app.globalData.openid);
+    
+    // 如果有传入房间id，加载房间数据
+    if (options.id) {
+      this.setData({ roomId: options.id });
+      this.loadRoomData(options.id);
+    }
   },
+
+  // 进入页面时更新数据
+  onShow() {
+    if (!app.checkLogin()) {
+      return;
+    }
+    this.getUserData(app.globalData.openid);
+    if (this.data.roomId) {
+      this.loadRoomData(this.data.roomId);
+    }
+  },
+
+  // 启用下拉刷新
+  onPullDownRefresh() {
+    if (this.data.roomId) {
+      this.setData({ isRefreshing: true });
+      this.loadRoomData(this.data.roomId).then(() => {
+        wx.stopPullDownRefresh();
+        this.setData({ isRefreshing: false });
+      });
+    } else {
+      wx.stopPullDownRefresh();
+    }
+  },
+
+  // 加载房间数据
+  async loadRoomData(roomId) {
+    if (this.data.isLoading) return;
+    
+    this.setData({ isLoading: true });
+    try {
+      // 获取房间信息
+      const roomRes = await db.collection('room').doc(roomId).get();
+      
+      if (roomRes.data) {
+        const users = roomRes.data.users || [];
+        
+        // 获取该房间的所有打卡记录
+        const checkinsRes = await db.collection('checkins')
+          .where({
+            roomId: roomId
+          })
+          .get();
+        
+        const checkins = checkinsRes.data || [];
+        
+        // 统计每个用户的打卡次数
+        const userAttempts = {};
+        checkins.forEach(checkin => {
+          userAttempts[checkin.openid] = (userAttempts[checkin.openid] || 0) + 1;
+        });
+        
+        // 处理用户数据
+        const sortedUsers = users.map(user => ({
+          name: user.userName || '未知用户',
+          score: user.score || 0,
+          attempts: userAttempts[user.openid] || 0,
+          avatarUrl: user.avatarUrl,
+          lastCheckin: user.lastCheckin,
+          openid: user.openid
+        })).sort((a, b) => b.score - a.score);
+
+        // 计算当前用户的排名和分数
+        const currentUserIndex = sortedUsers.findIndex(user => user.openid === app.globalData.openid);
+        const currentUser = sortedUsers[currentUserIndex];
+        const userRank = currentUserIndex !== -1 ? currentUserIndex + 1 : '-';
+        const userScore = currentUser ? currentUser.score : 0;
+
+        this.setData({
+          roomInfo: roomRes.data,
+          leaderboard: sortedUsers,
+          userScore: userScore,
+          userRank: userRank,
+          stats: {
+            users: users.length,
+            attempts: checkins.length, // 使用实际的打卡记录总数
+            totalScore: users.reduce((sum, user) => sum + (user.score || 0), 0)
+          }
+        });
+      }
+    } catch (err) {
+      console.error('获取房间数据失败:', err);
+      wx.showToast({
+        title: '获取房间数据失败',
+        icon: 'none'
+      });
+    } finally {
+      this.setData({ isLoading: false });
+    }
+  },
+
   onAvatarTap() {
     this.setData({
       isSidebarVisible: true
@@ -30,7 +132,7 @@ Page({
       this.setData({
         sidebarAnimClass: 'slide-in'
       });
-    }, 20); // 给一点延迟，保证 class 变更生效
+    }, 20);
   },
 
   closeSidebar() {
@@ -42,89 +144,11 @@ Page({
       this.setData({
         isSidebarVisible: false
       });
-    }, 300); // 和动画时长一致
+    }, 300);
   },
 
-  stopTap() {}, // 阻止冒泡,
-  loadLeaderboard() {
-    // wx.getStorageSync('leaderboard') ||
-    let leaderboard =  [
-      {
-      name: '阿威',
-      score: 57,
-      attempts: 20
-    },
-      {
-      name: '阿威',
-      score: 57,
-      attempts: 20
-    },
-      {
-      name: '阿威',
-      score: 57,
-      attempts: 20
-    },
-      {
-      name: '阿威',
-      score: 57,
-      attempts: 20
-    },
-      {
-      name: '阿威',
-      score: 57,
-      attempts: 20
-    },
-      {
-      name: '阿威',
-      score: 57,
-      attempts: 20
-    },
-      {
-      name: '阿威',
-      score: 57,
-      attempts: 20
-    },
-      {
-      name: '阿威',
-      score: 57,
-      attempts: 20
-    },
-      {
-      name: '阿威',
-      score: 57,
-      attempts: 20
-    },
-    {
-      name: 'Yohanes',
-      score: 56,
-      attempts: 21
-    },
-    {
-      name: '乐乐',
-      score: 44,
-      attempts: 18
-    },
-    {
-      name: '小明',
-      score: 39,
-      attempts: 15
-    },
-    {
-      name: '张三',
-      score: 35,
-      attempts: 12
-    }];
-    console.log(leaderboard);
-    leaderboard.sort((a, b) => b.score - a.score); // 按分数排序
-    
-    let stats = {
-      users: leaderboard.length,
-      attempts: leaderboard.reduce((sum, user) => sum + user.attempts, 0),
-      totalScore: leaderboard.reduce((sum, user) => sum + user.score, 0)
-    };
+  stopTap() {},
 
-    this.setData({ leaderboard, stats });
-  },
   // 获取用户数据
   async getUserData(openid) {
     try {
@@ -135,12 +159,10 @@ Page({
         this.setData({
           userInfo: {
             ...this.data.userInfo,
-            ...res.data[0].userInfo // 合并云数据库中的用户数据
+            ...res.data[0].userInfo
           }
         })
       }
-      console.log('res', this.data.userInfo);
-
     } catch (error) {
       console.error('获取用户数据失败:', error)
       wx.showToast({
@@ -149,15 +171,22 @@ Page({
       })
     }
   },
+
   navigateToCheckins() {
     wx.navigateTo({
-      url: '/pages/checkins/checkins'
+      url: `/pages/checkins/checkins?roomId=${this.data.roomId}`
     });
-  }
-  ,
+  },
+
   navigateToRoom() {
     wx.navigateTo({
       url: '/pages/room/room'
     });
+  },
+
+  // 处理滚动到底部事件
+  onReachBottom() {
+    // 目前不需要加载更多数据，因为所有数据都一次性加载
+    // 如果将来需要分页，可以在这里实现
   }
 });

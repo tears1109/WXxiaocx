@@ -1,42 +1,49 @@
 <!-- pages/index/index.wxml -->
-<view class="container">
-  <!-- 新增个人信息头部 -->
-  <view class="user-header">
-    <image class="user-avatar" 
-       src="{{userInfo.avatarUrl || '/assets/images/default-avatar.jpg'}}" 
-       mode="aspectFill" 
-       bindtap="onAvatarTap"></image>
-
-    <view class="user-info">
-      <text class="user-name">{{userInfo.nickName || '微信用户'}}</text>
-      <text class="user-score">未设置分数</text>
+<view class="page-container">
+  <view class="fixed-content">
+    <!-- 个人信息头部 -->
+    <view class="user-header">
+      <image class="user-avatar" src="{{userInfo.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill" bindtap="onAvatarTap"></image>
+      <view class="user-info">
+        <text class="user-name">{{userInfo.nickName || '微信用户'}}</text>
+        <text class="user-score">总积分: {{userScore}}分</text>
+      </view>
+      <view class="user-rank">
+        <text class="rank-label">排名</text>
+        <text class="rank-value">{{userRank}}</text>
+      </view>
     </view>
-    <view class="user-rank">
-      <text class="rank-label">排名</text>
-      <text class="rank-value">未上榜</text>
+    <!-- 房间信息 -->
+    <view class="room-header" wx:if="{{roomInfo}}">
+      <text class="room-name">{{roomInfo.name || '未命名房间'}}</text>
+      <text class="room-type">{{roomInfo.type}}</text>
+    </view>
+    <view class="stats">
+      <text class="stats-item">参与人数: {{stats.users}}</text>
+      <text class="stats-item">打卡次数: {{stats.attempts}}</text>
+      <text class="stats-item">总分: {{stats.totalScore}}</text>
     </view>
   </view>
-
-  <view class="stats">
-    <text class="stats-item">参与人数: {{stats.users}}</text>
-    <text class="stats-item">答题次数: {{stats.attempts}}</text>
-    <text class="stats-item">总分: {{stats.totalScore}}</text>
-  </view>
-  <view class="leaderboard-container">
+  <view class="scrollable-content">
     <scroll-view scroll-y class="leaderboard-scroll">
       <view class="leaderboard">
         <block wx:for="{{leaderboard}}" wx:key="index">
           <view class="user-item {{index === 0 ? 'first' : ''}}">
             <text class="rank">{{index + 1}}</text>
-            <image class="avatar" src="{{item.avatar || '/assets/images/default-avatar.jpg'}}" mode="aspectFill"></image>
-            <text class="name">{{item.name}}</text>
+            <image class="avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
+            <view class="user-detail">
+              <text class="name">{{item.name}}</text>
+              <text class="attempts">打卡{{item.attempts}}次</text>
+            </view>
             <text class="score">{{item.score}} 分</text>
           </view>
         </block>
       </view>
     </scroll-view>
   </view>
-  <button class="checkin-button" bindtap="navigateToCheckins">今日打卡</button>
+  <view class="fixed-bottom">
+    <button class="checkin-button" bindtap="navigateToCheckins">今日打卡</button>
+  </view>
 </view>
 <view wx:if="{{isSidebarVisible}}" class="sidebar-overlay" catchtap="closeSidebar">
   <view class="sidebar-popup {{sidebarAnimClass}}" catchtap="stopTap">
@@ -52,4 +59,3 @@
     </view>
   </view>
 </view>
-

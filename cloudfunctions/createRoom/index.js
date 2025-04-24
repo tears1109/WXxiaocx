@@ -22,7 +22,6 @@ exports.main = async (event) => {
   }
 
   const code = generateCode()
-console.log('roomName',roomName);
   try {
     const roomRes = await db.collection('room').add({
       data: {
