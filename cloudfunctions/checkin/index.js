@@ -20,7 +20,7 @@ async function ensureCollection(collectionName) {
 }
 
 exports.main = async (event) => {
-  const { openid, userName, avatarUrl, roomId, content, duration } = event
+  const { openid, userName, avatarUrl, roomId, content, duration, image = '' } = event
 
   if (!roomId) {
     return {
@@ -40,9 +40,26 @@ exports.main = async (event) => {
     // 确保集合存在
     await ensureCollection('checkins')
 
-    // 生成分数（基于时长计算）
-    // 每60分钟得到1分，最低1分，最高10分
-    const score = Math.min(10, Math.max(1, Math.floor(duration / 60) + 1))
+    // 根据房主设置的打卡等级计算分数，若未设置则默认 1 分
+    // 获取房间文档及其 settings 字段
+    const roomDoc = await db.collection('room').doc(roomId).get();
+    const settings = Array.isArray(roomDoc.data.settings) ? roomDoc.data.settings : [];
+    let score = 1;
+    if (settings.length > 0) {
+      // 解析并按时长升序排序
+      const levels = settings
+        .map(item => ({ duration: Number(item.duration), points: Number(item.points) }))
+        .filter(l => !isNaN(l.duration) && !isNaN(l.points))
+        .sort((a, b) => a.duration - b.duration);
+      // 遍历找到匹配的最高等级
+      for (const lvl of levels) {
+        if (duration >= lvl.duration) {
+          score = lvl.points;
+        } else {
+          break;
+        }
+      }
+    }
 
     // 记录打卡
     await db.collection('checkins').add({
@@ -51,13 +68,26 @@ exports.main = async (event) => {
         userName,
         avatarUrl,
         roomId,
-        content: content || '',  // 打卡内容
-        duration: duration,      // 打卡时长（分钟）
+        content: content || '',    // 打卡内容
+        duration: duration,        // 打卡时长（分钟）
+        image: image,              // 打卡图片文件ID
         score,
         checkinTime: new Date(),
         createTime: new Date()
       }
     })
+
+    // 更新房间用户分数到 room 集合中
+    const roomForUpdate = await db.collection('room').doc(roomId).get();
+    const usersArray = Array.isArray(roomForUpdate.data.users) ? roomForUpdate.data.users : [];
+    const userIdx = usersArray.findIndex(u => u.openid === openid);
+    if (userIdx !== -1) {
+      await db.collection('room').doc(roomId).update({
+        data: {
+          [`users.${userIdx}.score`]: _.inc(score)
+        }
+      });
+    }
 
     return {
       success: true,

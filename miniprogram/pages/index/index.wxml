@@ -34,7 +34,7 @@
     <scroll-view scroll-y class="leaderboard-scroll">
       <view class="leaderboard">
         <block wx:for="{{leaderboard}}" wx:key="index">
-          <view class="user-item {{index === 0 ? 'first' : ''}}">
+          <view class="user-item {{index === 0 ? 'first' : ''}}" bindtap="showUserModal" data-item="{{item}}">
             <text class="rank">{{index + 1}}</text>
             <image class="avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
             <view class="user-detail">
@@ -57,14 +57,73 @@
     <view class="sidebar-body">
       <text>昵称：{{roomUser.name || '微信用户'}}</text>
     </view>
-    <view class="sidebar-body" bindtap="navigateToRoom">
+    <view class="sidebar-body" bindtap="exitRoom">
       <text>退出房间</text>
+    </view>
+    <view class="sidebar-body" wx:if="{{isOwner}}" bindtap="openSettingsModal">
+      <text>设置</text>
     </view>
     <view class="sidebar-body" bindtap="navigateToProfile">
       <text>修改资料</text>
     </view>
     <view class="sidebar-body" bindtap="handleLogout">
       <text>退出登录</text>
+    </view>
+  </view>
+</view>
+<!-- 设置弹窗 -->
+<view wx:if="{{showSettingsModal}}" class="modal-overlay" catchtap="closeSettingsModal">
+  <view class="modal-popup" catchtap="stopTap">
+    <view class="modal-header">打卡等级设置</view>
+    <view class="modal-body">
+      <block wx:for="{{settings}}" wx:key="index">
+        <view class="setting-item" data-index="{{index}}">
+          <input placeholder="时长(分钟)" data-index="{{index}}" data-key="duration" bindinput="onSettingInput" value="{{item.duration}}" />
+          <input placeholder="得分" data-index="{{index}}" data-key="points" bindinput="onSettingInput" value="{{item.points}}" />
+          <button wx:if="{{settings.length > 1}}" data-index="{{index}}" bindtap="removeLevel">
+            删除
+          </button>
+        </view>
+      </block>
+      <button wx:if="{{settings.length < 5}}" class="add-level-button" bindtap="addLevel">
+        添加等级
+      </button>
+    </view>
+    <view class="modal-footer">
+      <button class="footer-on-button" bindtap="closeSettingsModal">取消</button>
+      <button class="footer-button" bindtap="onSaveSettings">保存</button>
+    </view>
+  </view>
+</view>
+<!-- 用户详情弹窗 -->
+<view wx:if="{{showUserModal}}" class="modal-overlay" bindtap="hideUserModal">
+  <view class="modal-popup" catchtap="stopTap">
+    <view class="modal-header">
+      <text>用户详情</text>
+      <view class="close-btn" bindtap="hideUserModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="detail-item">
+        <image class="avatar-large" src="{{selectedUser.avatarUrl}}" mode="aspectFill" />
+      </view>
+      <view class="detail-item">
+        <text>昵称：</text>
+        <text>{{selectedUser.name}}</text>
+      </view>
+      <view class="detail-item">
+        <text>积分：</text>
+        <text>{{selectedUser.score}}</text>
+      </view>
+      <view class="detail-item">
+        <text>打卡次数：</text>
+        <text>{{selectedUser.attempts}}</text>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button wx:if="{{isOwner && selectedUser.openid !== currentOpenid}}" class="footer-button" bindtap="kickSelectedUser">
+        踢出
+      </button>
+      <button class="footer-button" bindtap="hideUserModal">关闭</button>
     </view>
   </view>
 </view>

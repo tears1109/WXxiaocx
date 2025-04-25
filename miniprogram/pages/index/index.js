@@ -2,6 +2,7 @@ const db = wx.cloud.database()
 const app = getApp();
 Page({
   data: {
+    currentOpenid: '', // 当前用户 openid
     isSidebarVisible: false, // 控制侧边栏弹窗显示
     sidebarAnimClass: '',
     userInfo: null,
@@ -19,12 +20,19 @@ Page({
     userScore: 0,    // 用户总分
     userRank: '-',   // 用户排名
     roomUser: { name: '', avatarUrl: '' },
+    isOwner: false, // 是否为房主
+    showSettingsModal: false,
+    settings: [], // 打卡配置等级
+    showUserModal: false, // 控制用户详情弹窗显示
+    selectedUser: {},     // 存储选择的用户信息
   },
 
   onLoad(options) {
     if (!app.checkLogin()) {
       return;
     }
+    // 设置当前用户 openid
+    this.setData({ currentOpenid: app.globalData.openid });
     this.getUserData(app.globalData.openid);
     
     // 如果有传入房间id，加载房间数据
@@ -128,10 +136,13 @@ Page({
           userRank: userRank,
           stats: {
             users: users.length,
-            attempts: checkins.length, // 使用实际的打卡记录总数
+            attempts: checkins.length,
             totalScore: users.reduce((sum, user) => sum + (user.score || 0), 0)
           },
-          roomUser: roomUser
+          roomUser: roomUser,
+          // 房主判断及初始设置
+          isOwner: roomRes.data.createdBy === app.globalData.openid,
+          settings: roomRes.data.settings || [{ duration: '', points: '' }]
         });
       }
     } catch (err) {
@@ -234,5 +245,147 @@ Page({
   onReachBottom() {
     // 目前不需要加载更多数据，因为所有数据都一次性加载
     // 如果将来需要分页，可以在这里实现
-  }
+  },
+
+  // 打开设置弹窗
+  openSettingsModal() {
+    this.setData({ showSettingsModal: true });
+  },
+
+  // 关闭设置弹窗
+  closeSettingsModal() {
+    this.setData({ showSettingsModal: false });
+  },
+
+  // 输入配置项
+  onSettingInput(e) {
+    const { index, key } = e.currentTarget.dataset;
+    const value = e.detail.value;
+    const newSettings = [...this.data.settings];
+    newSettings[index][key] = value;
+    this.setData({ settings: newSettings });
+  },
+
+  // 添加等级
+  addLevel() {
+    if (this.data.settings.length < 5) {
+      this.setData({ settings: [...this.data.settings, { duration: '', points: '' }] });
+    }
+  },
+
+  // 删除等级
+  removeLevel(e) {
+    const { index } = e.currentTarget.dataset;
+    const newSettings = this.data.settings.filter((_, i) => i !== index);
+    this.setData({ settings: newSettings });
+  },
+
+  // 保存设置
+  async onSaveSettings() {
+    const { settings } = this.data;
+    // 简单校验
+    for (const item of settings) {
+      if (!item.duration || !item.points) {
+        wx.showToast({ title: '请填写完整等级信息', icon: 'none' });
+        return;
+      }
+    }
+    try {
+      wx.showLoading({ title: '保存中...' });
+      // 使用云函数执行更新
+      const resCloud = await wx.cloud.callFunction({
+        name: 'updateRoomSettings',
+        data: { roomId: this.data.roomId, settings: this.data.settings }
+      });
+      console.log('-> 云函数更新结果', resCloud);
+      if (!resCloud.result || !resCloud.result.success) {
+        wx.hideLoading();
+        wx.showToast({ title: resCloud.result.message || '保存失败', icon: 'none' });
+        return;
+      }
+      wx.hideLoading();
+      wx.showToast({ title: '保存成功', icon: 'success' });
+      this.closeSettingsModal();
+      // 刷新房间数据
+      this.loadRoomData(this.data.roomId);
+    } catch (err) {
+      wx.hideLoading();
+      wx.showToast({ title: '保存失败', icon: 'none' });
+      console.error('保存设置失败', err);
+    }
+  },
+
+  // 新增：显示用户详情弹窗
+  showUserModal(e) {
+    const user = e.currentTarget.dataset.item;
+    this.setData({
+      showUserModal: true,
+      selectedUser: user
+    });
+  },
+
+  // 新增：隐藏用户详情弹窗
+  hideUserModal() {
+    this.setData({
+      showUserModal: false,
+      selectedUser: {}
+    });
+  },
+
+  // 新增：从弹窗踢出用户
+  kickSelectedUser() {
+    const targetOpenid = this.data.selectedUser.openid;
+    wx.showModal({
+      title: '踢出成员',
+      content: '确定要踢出该成员吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '操作中...' });
+          wx.cloud.callFunction({
+            name: 'removeUser',
+            data: { roomId: this.data.roomId, targetOpenid },
+            success: () => {
+              wx.hideLoading();
+              wx.showToast({ title: '已踢出', icon: 'success' });
+              this.hideUserModal();
+              this.loadRoomData(this.data.roomId);
+            },
+            fail: (err) => {
+              wx.hideLoading();
+              wx.showToast({ title: '操作失败', icon: 'none' });
+              console.error('踢人失败：', err);
+            }
+          });
+        }
+      }
+    });
+  },
+
+  // 新增：退出房间
+  exitRoom() {
+    wx.showModal({
+      title: '退出房间',
+      content: '确定要退出当前房间吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '退出中...' });
+          wx.cloud.callFunction({
+            name: 'removeUser',
+            data: { roomId: this.data.roomId, targetOpenid: this.data.currentOpenid },
+            success: () => {
+              wx.hideLoading();
+              wx.showToast({ title: '已退出', icon: 'success' });
+              // 跳转到房间列表页
+              wx.navigateTo({ url: '/pages/room/room' });
+            },
+            fail: (err) => {
+              wx.hideLoading();
+              wx.showToast({ title: '操作失败', icon: 'none' });
+              console.error('退出房间失败：', err);
+            }
+          });
+        }
+      }
+    });
+  },
 });

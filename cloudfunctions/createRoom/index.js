@@ -30,6 +30,7 @@ exports.main = async (event) => {
         type: roomType,           // ✅ 新增字段：房间类型
         createTime: new Date(),
         createdBy: openid,
+        settings: [],            // ✅ 默认打卡等级配置
         users: [
           {
             openid,

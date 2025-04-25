@@ -152,11 +152,10 @@
 }
 
 /* 排行榜 */
-.leaderboard {
- 
-}
+.leaderboard {}
 
 .user-item {
+  position: relative;
   display: flex;
   align-items: center;
   padding: 24rpx;
@@ -279,39 +278,55 @@
   animation: fadeIn 0.3s ease;
 }
 
+/* Sidebar styling */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+}
+
 .sidebar-popup {
   position: fixed;
   top: 0;
   left: 0;
-  width: 70%;
+  width: 360rpx;
   height: 100%;
-  background: white;
-  z-index: 101;
+  background: #fff;
+  padding: 20rpx;
+  box-shadow: 4rpx 0 12rpx rgba(0, 0, 0, 0.1);
   transform: translateX(-100%);
-  transition: transform 0.3s ease-out;
+  transition: transform 0.3s ease;
 }
 
 .sidebar-popup.slide-in {
   transform: translateX(0);
 }
 
+.sidebar-popup.slide-out {
+  transform: translateX(-100%);
+}
+
 .sidebar-header {
-  padding: 32rpx;
-  font-size: 44rpx;
-  font-weight: 600;
-  color: #333;
-  border-bottom: 2rpx solid #f0f2f5;
+  font-size: 30rpx !important;
+  font-weight: bold;
+  padding-bottom: 20rpx;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 20rpx;
 }
 
 .sidebar-body {
-  padding: 24rpx 32rpx;
-  font-size: 36rpx;
+  font-size: 26rpx !important;
+  padding: 14rpx 0;
   color: #333;
-  border-bottom: 2rpx solid #f0f2f5;
+  border-bottom: 1px solid #f5f5f5;
 }
 
-.sidebar-body:active {
-  background: #f8f9fd;
+.sidebar-body:last-child {
+  border-bottom: none;
 }
 
 /* 动画 */
@@ -331,4 +346,125 @@
   padding: 24rpx;
   color: #999;
   font-size: 28rpx;
+}
+
+/* 设置按钮 */
+.settings-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin: 12rpx 24rpx;
+}
+
+.settings-button {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color: #fff;
+  padding: 12rpx 24rpx;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+}
+
+/* 设置弹窗 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 300;
+}
+
+.modal-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  z-index: 301;
+}
+
+.modal-header {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-bottom: 20rpx;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.setting-item input {
+  flex: 1;
+  margin-right: 12rpx;
+  padding: 12rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+}
+
+.setting-item button {
+  background: #ff4d4f;
+  color: #fff;
+  padding: 12rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+}
+
+.add-level-button {
+  background: #1890ff;
+  color: #fff;
+  padding: 14rpx 0;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-footer .footer-on-button,
+.modal-footer .footer-button {
+  width: 45%;
+}
+
+/* 踢出成员按钮样式 */
+.kick-btn {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  padding: 6rpx 12rpx;
+  background: #ff4d4f;
+  color: #fff;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  z-index: 10;
+}
+
+/* 用户详情弹窗样式 */
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.avatar-large {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  margin: 0 auto 24rpx;
 }

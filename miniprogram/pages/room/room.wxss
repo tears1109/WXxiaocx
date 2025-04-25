@@ -9,8 +9,8 @@
 
 .input {
   /* width: 100%; */
-  padding: 24rpx;
-  font-size: 36rpx;
+  padding: 12px;
+  font-size: 16px;
   border-radius: 8px;
   margin-bottom: 20px;
   border: 1px solid #ddd;
@@ -36,20 +36,36 @@
   padding: 20rpx;
   border-radius: 20rpx;
   width: 80%;
+  font-size: 36rpx !important;
+}
+
+.modal-popup .modal-header {
+  font-size: 36rpx !important;
+}
+
+.modal-popup .input {
+  font-size: 18px !important;
+}
+
+.modal-popup .picker {
+  font-size: 18rpx !important;
+}
+
+.modal-popup .modal-footer button {
+  font-size: 16px !important;
 }
 
 .modal-header {
   font-weight: bold;
-  font-size: 40rpx;
+  font-size: 32rpx;
   margin-bottom: 20rpx;
 }
 
 .picker {
   border: 1px solid #ccc;
-  padding: 24rpx;
+  padding: 20rpx;
   margin-top: 20rpx;
   border-radius: 10rpx;
-  font-size: 36rpx;
 }
 
 .modal-footer {
@@ -64,14 +80,19 @@
 
 /* 新增用户头部样式 */
 .user-header {
-  width: 100%;
+  position: fixed !important;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 100;
+  margin-bottom: 0 !important;
   display: flex;
+  flex-direction: column;
   align-items: center;
   background: white;
   padding: 15px 0;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  /* border-radius: 12px; */
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
 }
 
 .avatar-r {
@@ -81,27 +102,28 @@
 
 .owner-tag {
   margin: 8rpx 0;
-  font-size: 28rpx;
+  font-size: 12px;
   color: #ff9500;
   background-color: #fff6e5;
-  padding: 6rpx 12rpx;
+  padding: 4rpx 10rpx;
   border-radius: 8rpx;
   display: inline-block;
 }
 
 .member-tag {
   margin: 8rpx 0;
-  font-size: 28rpx;
+  font-size: 12px;
   color: #fafafa;
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  padding: 6rpx 12rpx;
+  padding: 4rpx 10rpx;
   border-radius: 8rpx;
   display: inline-block;
 }
 
 .user-avatar {
-  width: 140rpx;
-  height: 140rpx;
+  width: 60px;
+  /* width: 100%; */
+  height: 60px;
   border-radius: 50%;
   margin-right: 15px;
   border: 2px solid #f0f2f5;
@@ -112,7 +134,7 @@
 }
 
 .user-name {
-  font-size: 42rpx;
+  font-size: 18px;
   font-weight: bold;
   color: #333;
   display: block;
@@ -120,7 +142,7 @@
 }
 
 .user-score {
-  font-size: 32rpx;
+  font-size: 14px;
   color: #666;
 }
 
@@ -181,6 +203,42 @@
 .leaderboard-scroll {
   /* width: 100%; */
   height: 100%;
+}
+
+.user-avatar-container {
+  display: flex;
+  /* flex-direction: column; */
+  align-items: center;
+  width: 100%;
+  background: #fff;
+  padding: 20rpx;
+  margin: 20rpx auto;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.user-avatar-container .user-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border: none;
+  margin-bottom: 10rpx;
+}
+
+.user-avatar-container .user-name {
+  font-size: 20rpx;
+  margin-bottom: 5rpx;
+}
+
+.user-avatar-container .input {
+  width: 100%;
+  margin: 10rpx 0;
+  padding: 14rpx;
+}
+
+.user-avatar-container .join-button {
+  width: 100%;
+  padding: 14rpx 0;
+  font-size: 16rpx;
 }
 
 .leaderboard {
@@ -307,11 +365,11 @@
   right: 20px;
   background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
   border: none;
-  font-size: 36rpx;
+  font-size: 14px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   margin-right: 15px;
   color: white;
-  padding: 15px 30px;
+  padding: 10px 20px;
   border-radius: 20px;
 }
 
@@ -374,19 +432,21 @@
 /* container 已有样式就不重复写了 */
 
 .section-title {
-  font-size: 40rpx;
+  font-size: 16px;
   font-weight: bold;
   margin: 20rpx 30rpx 10rpx;
   color: #333;
 }
 
 .room-list {
+  margin-top: 260px !important;
   width: 100%;
+  margin-bottom: 30px;
 }
 
 .room-block {
-  height: 50vh;
-  overflow: hidden;
+  height: auto !important;
+  overflow: visible !important;
 }
 
 .room-item {
@@ -406,14 +466,14 @@
 }
 
 .room-name {
-  font-size: 36rpx;
+  font-size: 16px;
   font-weight: 600;
   color: #333;
 }
 
 .room-type,
 .room-users {
-  font-size: 32rpx;
+  font-size: 14px;
   color: #888;
   margin-top: 6rpx;
 }
@@ -421,65 +481,58 @@
 .join-button {
   background-color: #007aff;
   color: white;
-  padding: 14rpx 28rpx;
-  font-size: 32rpx;
+  padding: 10rpx 24rpx;
+  font-size: 14px;
   border-radius: 8rpx;
 }
 
-/* 侧边栏样式 */
+/* Sidebar styling */
 .sidebar-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 100;
-  animation: fadeIn 0.3s ease;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
 }
 
 .sidebar-popup {
   position: fixed;
   top: 0;
   left: 0;
-  width: 70%;
+  width: 360rpx;
   height: 100%;
-  background: white;
-  z-index: 101;
+  background: #fff;
+  padding: 20rpx;
+  box-shadow: 4rpx 0 12rpx rgba(0, 0, 0, 0.1);
   transform: translateX(-100%);
-  transition: transform 0.3s ease-out;
+  transition: transform 0.3s ease;
 }
 
 .sidebar-popup.slide-in {
   transform: translateX(0);
 }
 
+.sidebar-popup.slide-out {
+  transform: translateX(-100%);
+}
+
 .sidebar-header {
-  padding: 32rpx;
-  font-size: 44rpx;
-  font-weight: 600;
-  color: #333;
-  border-bottom: 2rpx solid #f0f2f5;
+  font-size: 30rpx !important;
+  font-weight: bold;
+  padding-bottom: 20rpx;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 20rpx;
 }
 
 .sidebar-body {
-  padding: 24rpx 32rpx;
-  font-size: 36rpx;
+  font-size: 26rpx !important;
+  padding: 14rpx 0;
   color: #333;
-  border-bottom: 2rpx solid #f0f2f5;
+  border-bottom: 1px solid #f5f5f5;
 }
 
-.sidebar-body:active {
-  background: #f8f9fd;
-}
-
-/* 动画 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+.sidebar-body:last-child {
+  border-bottom: none;
 }

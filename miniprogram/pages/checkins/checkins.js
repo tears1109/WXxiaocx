@@ -3,6 +3,7 @@ const app = getApp();
 
 Page({
   data: {
+    currentOpenid: '', // 当前用户openid
     userInfo: null,
     todayCheckins: [], // 今日打卡用户列表
     roomInfo: null,    // 房间信息
@@ -13,16 +14,25 @@ Page({
     },
     checkinContent: '', // 打卡内容
     duration: '',      // 打卡时长
-    showCheckinModal: false // 控制打卡弹窗显示
+    showCheckinModal: false, // 控制打卡弹窗显示
+    checkinImage: '', // 存储选中的图片临时路径
+    showContentModal: false, // 控制查看打卡内容弹窗
+    selectedContent: '', // 存储待查看的打卡内容
+    selectedDuration: '', // 存储待查看的打卡时长
+    selectedImage: '' // 存储待查看的打卡图片
   },
 
   onLoad(options) {
     if (!app.checkLogin()) {
       return;
     }
+    // 设置当前用户openid和房间ID
+    const currentOpenid = app.globalData.openid;
     if (options.roomId) {
-      this.setData({ roomId: options.roomId });
+      this.setData({ currentOpenid, roomId: options.roomId });
       this.loadRoomInfo(options.roomId);
+    } else {
+      this.setData({ currentOpenid });
     }
     this.getUserData(app.globalData.openid);
     this.loadTodayCheckins();
@@ -61,82 +71,129 @@ Page({
     });
   },
 
-  // 打卡
-  async onCheckin() {
-    if (!this.data.roomId) {
+  // 选择图片
+  chooseImage() {
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        this.setData({
+          checkinImage: res.tempFilePaths[0]
+        });
+      }
+    });
+  },
+
+  // 删除图片
+  deleteImage() {
+    this.setData({
+      checkinImage: ''
+    });
+  },
+
+  // 提交打卡
+  submitCheckin() {
+    const { checkinContent, duration, checkinImage } = this.data;
+    
+    if (!checkinContent) {
       wx.showToast({
-        title: '房间信息错误',
+        title: '请输入打卡内容',
         icon: 'none'
       });
       return;
     }
 
-    if (!this.data.duration) {
+    if (!duration) {
       wx.showToast({
-        title: '请输入打卡时长',
+        title: '请输入学习时长',
         icon: 'none'
       });
       return;
     }
 
-    const duration = parseInt(this.data.duration);
-    if (isNaN(duration) || duration <= 0) {
-      wx.showToast({
-        title: '请输入有效的时长',
-        icon: 'none'
+    // 如果有图片，先上传图片
+    if (checkinImage) {
+      wx.showLoading({
+        title: '上传图片中...',
       });
-      return;
-    }
-
-    wx.showLoading({ title: '打卡中...' });
-
-    try {
-      const res = await wx.cloud.callFunction({
-        name: 'checkin',
-        data: {
-          openid: app.globalData.openid,
-          userName: this.data.userInfo.nickName,
-          avatarUrl: this.data.userInfo.avatarUrl,
-          roomId: this.data.roomId,
-          content: this.data.checkinContent,
-          duration: duration
+      
+      wx.cloud.uploadFile({
+        cloudPath: `checkin_images/${Date.now()}.jpg`,
+        filePath: checkinImage,
+        success: res => {
+          // 上传成功后提交打卡数据
+          this.submitCheckinData(res.fileID);
+        },
+        fail: err => {
+          wx.hideLoading();
+          wx.showToast({
+            title: '图片上传失败',
+            icon: 'none'
+          });
+          console.error('图片上传失败：', err);
         }
       });
+    } else {
+      // 没有图片直接提交打卡数据
+      this.submitCheckinData();
+    }
+  },
 
-      wx.hideLoading();
-
-      if (res.result.success) {
-        // 更新房间用户分数
-        await this.updateRoomUserScore(res.result.score);
-        
+  // 提交打卡数据
+  submitCheckinData(imageFileID = '') {
+    const { checkinContent, duration } = this.data;
+    
+    wx.cloud.callFunction({
+      name: 'checkin',
+      data: {
+        openid: app.globalData.openid,
+        userName: this.data.userInfo.nickName,
+        avatarUrl: this.data.userInfo.avatarUrl,
+        roomId: this.data.roomId,
+        content: checkinContent,
+        duration: duration,
+        image: imageFileID
+      },
+      success: res => {
+        const score = res.result && res.result.score;
+        wx.hideLoading();
         wx.showToast({
           title: '打卡成功',
           icon: 'success'
         });
-
-        // 清空输入并关闭弹窗
         this.setData({
+          showCheckinModal: false,
           checkinContent: '',
           duration: '',
-          showCheckinModal: false
+          checkinImage: ''
         });
-
-        // 重新加载打卡数据
+        // 更新房间用户分数
+        const updateScorePromise = score ? this.updateRoomUserScore(score) : Promise.resolve();
+        // 刷新打卡列表
         this.loadTodayCheckins();
-      } else {
+        // 完成分数更新后，返回首页并刷新排行榜
+        updateScorePromise.then(() => {
+          wx.navigateBack({
+            success: () => {
+              const pages = getCurrentPages();
+              const prevPage = pages[pages.length - 1];
+              if (prevPage && prevPage.loadRoomData) {
+                prevPage.loadRoomData(prevPage.data.roomId);
+              }
+            }
+          });
+        });
+      },
+      fail: err => {
+        wx.hideLoading();
         wx.showToast({
-          title: res.result.message || '打卡失败',
+          title: '打卡失败',
           icon: 'none'
         });
+        console.error('打卡失败：', err);
       }
-    } catch (err) {
-      wx.hideLoading();
-      console.error('打卡失败：', err);
-      wx.showToast({
-        title: '系统错误',
-        icon: 'none'
-      });
-    }
+    });
   },
 
   // 加载房间信息
@@ -233,5 +290,65 @@ Page({
 
   navigateBack() {
     wx.navigateBack();
+  },
+
+  // 新增：显示打卡内容弹窗
+  showContentModal(e) {
+    const { content = '', duration = '', image = '' } = e.currentTarget.dataset;
+    this.setData({
+      showContentModal: true,
+      selectedContent: content,
+      selectedDuration: duration,
+      selectedImage: image
+    });
+  },
+
+  // 新增：隐藏打卡内容弹窗
+  hideContentModal() {
+    this.setData({
+      showContentModal: false,
+      selectedContent: '',
+      selectedDuration: '',
+      selectedImage: ''
+    });
+  },
+
+  // 新增：预览图片方法
+  previewImageByUrl(e) {
+    const url = e.currentTarget.dataset.url;
+    if (!url) return;
+    wx.previewImage({
+      current: url,
+      urls: [url]
+    });
+  },
+
+  // 删除打卡记录
+  deleteCheckin(e) {
+    const checkinId = e.currentTarget.dataset.id;
+    wx.showModal({
+      title: '删除打卡',
+      content: '确定要删除此条打卡记录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '删除中...' });
+          wx.cloud.callFunction({
+            name: 'deleteCheckin',
+            data: { checkinId, roomId: this.data.roomId },
+            success: (resp) => {
+              wx.hideLoading();
+              wx.showToast({ title: '删除成功', icon: 'success' });
+              // 重新加载打卡列表
+              this.loadTodayCheckins();
+            },
+            fail: (err) => {
+              wx.hideLoading();
+              wx.showToast({ title: '删除失败', icon: 'none' });
+              console.error('删除打卡失败：', err);
+            }
+          });
+        }
+      }
+    });
   }
 });
