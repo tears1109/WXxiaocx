@@ -11,11 +11,63 @@ Page({
     gender: '未知',
     canIUseGetUserProfile: false,
     hasUserInfo: false,
-    defaultAvatar: 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
+    defaultAvatar: 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0',
+    isDarkMode: false
   },
 
   onLoad() {
     this.loadUserData();
+    this.loadThemeSettings();
+  },
+
+  // 加载主题设置
+  loadThemeSettings() {
+    const themeSettings = wx.getStorageSync('themeSettings') || { isDarkMode: false };
+    this.setData({
+      isDarkMode: themeSettings.isDarkMode
+    });
+    
+    // 应用主题设置
+    if (themeSettings.isDarkMode) {
+      wx.setNavigationBarColor({
+        frontColor: '#ffffff',
+        backgroundColor: '#121212'
+      });
+    } else {
+      wx.setNavigationBarColor({
+        frontColor: '#000000',
+        backgroundColor: '#ffffff'
+      });
+    }
+  },
+  
+  // 切换主题
+  toggleTheme() {
+    const newDarkMode = !this.data.isDarkMode;
+    this.setData({
+      isDarkMode: newDarkMode
+    });
+    
+    // 保存设置
+    wx.setStorageSync('themeSettings', { isDarkMode: newDarkMode });
+    
+    // 设置导航栏颜色
+    if (newDarkMode) {
+      wx.setNavigationBarColor({
+        frontColor: '#ffffff',
+        backgroundColor: '#121212'
+      });
+    } else {
+      wx.setNavigationBarColor({
+        frontColor: '#000000',
+        backgroundColor: '#ffffff'
+      });
+    }
+    
+    // 通知app更新全局主题
+    if (app.globalData) {
+      app.globalData.isDarkMode = newDarkMode;
+    }
   },
 
   // 加载用户数据

@@ -1,9 +1,16 @@
 <!-- 页面元信息 -->
 <page-meta>
-  <navigation-bar title="个人资料" front-color="#000000" background-color="#ffffff" />
+  <navigation-bar title="个人资料" front-color="{{isDarkMode ? '#ffffff' : '#000000'}}" background-color="{{isDarkMode ? '#121212' : '#ffffff'}}" />
 </page-meta>
-<scroll-view class="container" scroll-y type="list">
-  <view class="container">
+
+  <view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+    <!-- 主题切换按钮 -->
+    <view class="theme-toggle" bindtap="toggleTheme">
+      <view class="theme-icon">
+        <view class="{{isDarkMode ? 'moon-icon' : 'sun-icon'}}"></view>
+      </view>
+      <text>{{isDarkMode ? '浅色' : '深色'}}</text>
+    </view>
     <!-- 头像和昵称区域 -->
     <view class="userinfo">
       <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
@@ -32,4 +39,3 @@
     <!-- 保存按钮 -->
     <button class="save-button" bindtap="onSave">保存</button>
   </view>
-</scroll-view>

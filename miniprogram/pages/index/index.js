@@ -5,6 +5,7 @@ Page({
     currentOpenid: '', // 当前用户 openid
     isSidebarVisible: false, // 控制侧边栏弹窗显示
     sidebarAnimClass: '',
+    isRightSidebar: false, // 是否为右侧边栏
     userInfo: null,
     stats: {
       users: 0,
@@ -25,6 +26,7 @@ Page({
     settings: [], // 打卡配置等级
     showUserModal: false, // 控制用户详情弹窗显示
     selectedUser: {},     // 存储选择的用户信息
+    isDarkMode: false // 主题模式：false为浅色，true为深色
   },
 
   onLoad(options) {
@@ -42,6 +44,9 @@ Page({
     } else {
       this.navigateToRoom();
     }
+    
+    // 加载主题设置
+    this.loadThemeSettings();
   },
 
   // 进入页面时更新数据
@@ -101,10 +106,16 @@ Page({
         
         const checkins = checkinsRes.data || [];
         
-        // 统计每个用户的打卡次数
+        // 统计每个用户的打卡次数和分数
         const userAttempts = {};
+        const userScores = {};
+        
         checkins.forEach(checkin => {
-          userAttempts[checkin.openid] = (userAttempts[checkin.openid] || 0) + 1;
+          const userOpenid = checkin.openid;
+          // 更新打卡次数
+          userAttempts[userOpenid] = (userAttempts[userOpenid] || 0) + 1;
+          // 更新用户总分 - 从打卡记录中累加分数
+          userScores[userOpenid] = (userScores[userOpenid] || 0) + (Number(checkin.score) || 0);
         });
         
         // 处理用户数据
@@ -115,7 +126,8 @@ Page({
           return {
             name: globalInfo.nickName || user.userName || '未知用户',
             avatarUrl: globalInfo.avatarUrl || user.avatarUrl || '',
-            score: user.score || 0,
+            // 使用从打卡记录中计算的分数，而不是room中存储的分数
+            score: userScores[user.openid] || 0,
             attempts: userAttempts[user.openid] || 0,
             lastCheckin: user.lastCheckin,
             openid: user.openid
@@ -137,7 +149,7 @@ Page({
           stats: {
             users: users.length,
             attempts: checkins.length,
-            totalScore: users.reduce((sum, user) => sum + (user.score || 0), 0)
+            totalScore: sortedUsers.reduce((sum, user) => sum + user.score, 0)
           },
           roomUser: roomUser,
           // 房主判断及初始设置
@@ -158,7 +170,22 @@ Page({
 
   onAvatarTap() {
     this.setData({
-      isSidebarVisible: true
+      isSidebarVisible: true,
+      isRightSidebar: false
+    });
+
+    setTimeout(() => {
+      this.setData({
+        sidebarAnimClass: 'slide-in'
+      });
+    }, 20);
+  },
+
+  // 添加点击用户名或其他区域打开右侧边栏
+  onOtherTap() {
+    this.setData({
+      isSidebarVisible: true,
+      isRightSidebar: true
     });
 
     setTimeout(() => {
@@ -387,5 +414,50 @@ Page({
         }
       }
     });
+  },
+
+  // 加载主题设置
+  loadThemeSettings() {
+    const themeSettings = wx.getStorageSync('themeSettings') || { isDarkMode: false };
+    this.setData({
+      isDarkMode: themeSettings.isDarkMode
+    });
+    
+    // 应用主题设置
+    if (themeSettings.isDarkMode) {
+      wx.setNavigationBarColor({
+        frontColor: '#ffffff',
+        backgroundColor: '#121212'
+      });
+    } else {
+      wx.setNavigationBarColor({
+        frontColor: '#000000',
+        backgroundColor: '#f5f6fa'
+      });
+    }
+  },
+  
+  // 切换主题
+  toggleTheme() {
+    const newDarkMode = !this.data.isDarkMode;
+    this.setData({
+      isDarkMode: newDarkMode
+    });
+    
+    // 保存设置
+    wx.setStorageSync('themeSettings', { isDarkMode: newDarkMode });
+    
+    // 设置导航栏颜色
+    if (newDarkMode) {
+      wx.setNavigationBarColor({
+        frontColor: '#ffffff',
+        backgroundColor: '#121212'
+      });
+    } else {
+      wx.setNavigationBarColor({
+        frontColor: '#000000',
+        backgroundColor: '#f5f6fa'
+      });
+    }
   },
 });

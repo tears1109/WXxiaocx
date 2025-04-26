@@ -1,10 +1,17 @@
 <!-- pages/index/index.wxml -->
-<view class="page-container">
+<view class="page-container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
   <view class="fixed-content">
+    <!-- 主题切换按钮 -->
+    <!-- <view class="theme-toggle" bindtap="toggleTheme">
+      <view class="theme-icon">
+        <view class="{{isDarkMode ? 'moon-icon' : 'sun-icon'}}"></view>
+      </view>
+      <text>{{isDarkMode ? '切换到浅色' : '切换到深色'}}</text>
+    </view> -->
     <!-- 个人信息头部 -->
     <view class="user-header">
       <image class="user-avatar" src="{{roomUser.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill" bindtap="onAvatarTap"></image>
-      <view class="user-info">
+      <view class="user-info" bindtap="onOtherTap">
         <text class="user-name">{{roomUser.name || '微信用户'}}</text>
         <text class="user-score">总积分: {{userScore}}分</text>
       </view>
@@ -30,29 +37,25 @@
       <text class="stats-item">总分: {{stats.totalScore}}</text>
     </view>
   </view>
-  <view class="scrollable-content">
-    <scroll-view scroll-y class="leaderboard-scroll">
-      <view class="leaderboard">
-        <block wx:for="{{leaderboard}}" wx:key="index">
-          <view class="user-item {{index === 0 ? 'first' : ''}}" bindtap="showUserModal" data-item="{{item}}">
-            <text class="rank">{{index + 1}}</text>
-            <image class="avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
-            <view class="user-detail">
-              <text class="name">{{item.name}}</text>
-              <text class="attempts">打卡{{item.attempts}}次</text>
-            </view>
-            <text class="score">{{item.score}} 分</text>
-          </view>
-        </block>
+  <view class="leaderboard">
+    <block wx:for="{{leaderboard}}" wx:key="index">
+      <view class="user-item {{index === 0 ? 'first' : ''}}" bindtap="showUserModal" data-item="{{item}}">
+        <text class="rank">{{index + 1}}</text>
+        <image class="avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
+        <view class="user-detail">
+          <text class="name">{{item.name}}</text>
+          <text class="attempts">打卡{{item.attempts}}次</text>
+        </view>
+        <text class="score">{{item.score}} 分</text>
       </view>
-    </scroll-view>
+    </block>
   </view>
   <view class="fixed-bottom">
     <button class="checkin-button" bindtap="navigateToCheckins">今日打卡</button>
   </view>
 </view>
 <view wx:if="{{isSidebarVisible}}" class="sidebar-overlay" catchtap="closeSidebar">
-  <view class="sidebar-popup {{sidebarAnimClass}}" catchtap="stopTap">
+  <view class="sidebar-popup {{isRightSidebar ? 'right-sidebar' : ''}} {{sidebarAnimClass}}  {{isDarkMode ? 'dark-sidebar' : ''}}" catchtap="stopTap">
     <view class="sidebar-header">个人中心</view>
     <view class="sidebar-body">
       <text>昵称：{{roomUser.name || '微信用户'}}</text>
@@ -73,7 +76,7 @@
 </view>
 <!-- 设置弹窗 -->
 <view wx:if="{{showSettingsModal}}" class="modal-overlay" catchtap="closeSettingsModal">
-  <view class="modal-popup" catchtap="stopTap">
+  <view class="modal-popup {{isDarkMode ? 'dark-modal' : ''}}" catchtap="stopTap">
     <view class="modal-header">打卡等级设置</view>
     <view class="modal-body">
       <block wx:for="{{settings}}" wx:key="index">
@@ -97,7 +100,7 @@
 </view>
 <!-- 用户详情弹窗 -->
 <view wx:if="{{showUserModal}}" class="modal-overlay" bindtap="hideUserModal">
-  <view class="modal-popup" catchtap="stopTap">
+  <view class="modal-popup {{isDarkMode ? 'dark-modal' : ''}}" catchtap="stopTap">
     <view class="modal-header">
       <text>用户详情</text>
       <view class="close-btn" bindtap="hideUserModal">×</view>
@@ -120,7 +123,7 @@
       </view>
     </view>
     <view class="modal-footer">
-      <button wx:if="{{isOwner && selectedUser.openid !== currentOpenid}}" class="footer-button" bindtap="kickSelectedUser">
+      <button wx:if="{{isOwner && selectedUser.openid !== currentOpenid}}" class="footer-button-kick " bindtap="kickSelectedUser">
         踢出
       </button>
       <button class="footer-button" bindtap="hideUserModal">关闭</button>

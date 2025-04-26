@@ -10,20 +10,67 @@ Page({
     selectedRoomType: '',
     code: '',
     userInfo: {}, // 可通过 wx.getUserProfile 获取或全局 app.userInfo
-    openid: app.globalData.openid,   // 登录后获取
+    openid: '', // 登录后获取，不要在此初始化
     isSidebarVisible: false,
-    sidebarAnimClass: ''
+    sidebarAnimClass: '',
+    isRightSidebar: false, // 是否为右侧边栏
+    user: null,
+    userInfo: null,
+    hasUserInfo: false,
+    canIUseGetUserProfile: false,
+    showJoinPopup: false,
+    roomCode: '',
+    roomId: '',
+    room: null,
+    leaderboard: [],
+    loading: true,
+    sidebarOpen: false,
+    isDarkMode: false,  // 添加深色模式标志
   },
 
   onLoad() {
+    if (!app.checkLogin()) {
+      return;
+    }
+    // 确保获取并设置正确的openid
+    this.setData({
+      openid: app.globalData.openid
+    });
     this.getUserData(app.globalData.openid);
     this.queryRoom();
+    this.loadThemeSetting();
   },
-  
+    // 进入页面时更新数据
+    onShow() {
+      if (!app.checkLogin()) {
+        return;
+      }
+      // 确保每次显示页面时都获取最新的openid
+      this.setData({
+        openid: app.globalData.openid
+      });
+      this.getUserData(app.globalData.openid);
+      this.queryRoom();
+    },
   // 处理头像点击事件，显示侧边栏
   onAvatarTap() {
     this.setData({
-      isSidebarVisible: true
+      isSidebarVisible: true,
+      isRightSidebar: false
+    });
+
+    setTimeout(() => {
+      this.setData({
+        sidebarAnimClass: 'slide-in'
+      });
+    }, 20);
+  },
+  
+  // 处理点击用户名或其他区域打开右侧边栏
+  onOtherTap() {
+    this.setData({
+      isSidebarVisible: true,
+      isRightSidebar: true
     });
 
     setTimeout(() => {
@@ -148,27 +195,45 @@ Page({
   ,
   async queryRoom() {
     try {
-      console.log(666,this.data.openid);
+      // 确保在调用前检查openid是否存在
+      const openid = app.globalData.openid;
+      if (!openid) {
+        console.error('缺少openid，请先登录');
+        wx.showToast({ 
+          title: '请先登录', 
+          icon: 'none' 
+        });
+        return;
+      }
+      
+      console.log('正在查询房间，使用openid:', openid);
+      
       const res = await wx.cloud.callFunction({
         name: 'queryRoom',
-        data: { openid: this.data.openid }
-      })
+        data: { openid: openid } // 确保使用app.globalData中的openid
+      });
   
-      const result = res.result
+      const result = res.result;
   
       if (result.success) {
-        console.log('当前所在房间:', result.room)
+        console.log('当前所在房间:', result.room);
         // 按创建时间倒序排序
         const sortedRooms = result.room.sort((a, b) => {
           return new Date(b.createTime) - new Date(a.createTime);
         });
-        this.setData({ roomList: sortedRooms })
+        this.setData({ roomList: sortedRooms });
       } else {
-        wx.showToast({ title: result.message, icon: 'none' })
+        console.log('查询房间返回失败:', result.message);
+        if (result.message === '未加入任何房间') {
+          // 这是正常情况，不显示错误提示
+          this.setData({ roomList: [] });
+        } else {
+          wx.showToast({ title: result.message, icon: 'none' });
+        }
       }
     } catch (err) {
-      wx.showToast({ title: '系统错误', icon: 'none' })
-      console.error('调用失败:', err)
+      console.error('调用queryRoom失败:', err);
+      wx.showToast({ title: '系统错误', icon: 'none' });
     }
   }
 ,  
@@ -226,5 +291,50 @@ Page({
         this.onJoinRoom();
       });
     }
-  }
+  },
+
+  // 加载主题设置
+  loadThemeSetting() {
+    const themeSettings = wx.getStorageSync('themeSettings') || { isDarkMode: false };
+    this.setData({
+      isDarkMode: themeSettings.isDarkMode
+    });
+    
+    // 更新导航栏颜色
+    wx.setNavigationBarColor({
+      frontColor: themeSettings.isDarkMode ? '#ffffff' : '#000000',
+      backgroundColor: themeSettings.isDarkMode ? '#121212' : '#ffffff',
+      animation: {
+        duration: 300,
+        timingFunc: 'easeIn'
+      }
+    });
+  },
+  
+  // 切换主题
+  toggleTheme() {
+    const newDarkMode = !this.data.isDarkMode;
+    this.setData({
+      isDarkMode: newDarkMode
+    });
+    
+    // 保存设置到存储
+    wx.setStorageSync('themeSettings', { isDarkMode: newDarkMode });
+    
+    // 更新导航栏颜色
+    wx.setNavigationBarColor({
+      frontColor: newDarkMode ? '#ffffff' : '#000000',
+      backgroundColor: newDarkMode ? '#121212' : '#ffffff',
+      animation: {
+        duration: 300,
+        timingFunc: 'easeIn'
+      }
+    });
+    
+    // 通知app更新全局主题
+    const app = getApp();
+    if (app.globalData) {
+      app.globalData.darkMode = newDarkMode;
+    }
+  },
 });

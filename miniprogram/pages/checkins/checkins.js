@@ -6,6 +6,8 @@ Page({
     currentOpenid: '', // 当前用户openid
     userInfo: null,
     todayCheckins: [], // 今日打卡用户列表
+    historyCheckins: [], // 历史打卡用户列表
+    currentSwiper: 0, // 当前swiper索引
     roomInfo: null,    // 房间信息
     roomId: '', // 房间ID
     stats: {
@@ -19,7 +21,9 @@ Page({
     showContentModal: false, // 控制查看打卡内容弹窗
     selectedContent: '', // 存储待查看的打卡内容
     selectedDuration: '', // 存储待查看的打卡时长
-    selectedImage: '' // 存储待查看的打卡图片
+    selectedImage: '', // 存储待查看的打卡图片
+    itemToDelete: null, // 要删除的项目ID
+    isDarkMode: false // 主题模式：false为浅色，true为深色
   },
 
   onLoad(options) {
@@ -36,6 +40,18 @@ Page({
     }
     this.getUserData(app.globalData.openid);
     this.loadTodayCheckins();
+    this.loadHistoryCheckins();
+    
+    // 加载存储的主题设置
+    this.loadThemeSettings();
+  },
+
+  onReady() {
+    // 不再需要初始化粒子画布
+  },
+
+  onUnload() {
+    // 不再需要清理动画相关资源
   },
 
   // 显示打卡弹窗
@@ -323,32 +339,191 @@ Page({
     });
   },
 
-  // 删除打卡记录
+  // 修改删除打卡记录函数
   deleteCheckin(e) {
     const checkinId = e.currentTarget.dataset.id;
+    const itemId = e.currentTarget.id || `checkin-${checkinId}`;
+    
     wx.showModal({
       title: '删除打卡',
       content: '确定要删除此条打卡记录吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.showLoading({ title: '删除中...' });
-          wx.cloud.callFunction({
-            name: 'deleteCheckin',
-            data: { checkinId, roomId: this.data.roomId },
-            success: (resp) => {
-              wx.hideLoading();
-              wx.showToast({ title: '删除成功', icon: 'success' });
-              // 重新加载打卡列表
-              this.loadTodayCheckins();
-            },
-            fail: (err) => {
-              wx.hideLoading();
-              wx.showToast({ title: '删除失败', icon: 'none' });
-              console.error('删除打卡失败：', err);
+          // 设置要删除的项目
+          this.setData({
+            itemToDelete: itemId
+          });
+          
+          // 添加删除动画CSS类
+          const query = wx.createSelectorQuery();
+          query.select(`#${itemId}`).boundingClientRect();
+          query.exec((rects) => {
+            if (rects && rects[0]) {
+              // 找到对应元素
+              wx.showLoading({ title: '删除中...' });
+              
+              // 延迟调用云函数，给动画留出时间
+              setTimeout(() => {
+                wx.cloud.callFunction({
+                  name: 'deleteCheckin',
+                  data: { checkinId, roomId: this.data.roomId },
+                  success: (resp) => {
+                    wx.hideLoading();
+                    wx.showToast({ title: '删除成功', icon: 'success' });
+                    
+                    // 重新加载打卡列表
+                    this.loadTodayCheckins();
+                    this.loadHistoryCheckins();
+                    
+                    // 刷新首页的排行榜数据
+                    const pages = getCurrentPages();
+                    for (let i = 0; i < pages.length; i++) {
+                      if (pages[i].route === 'pages/index/index') {
+                        const indexPage = pages[i];
+                        if (indexPage && indexPage.loadRoomData) {
+                          indexPage.loadRoomData(this.data.roomId);
+                        }
+                        break;
+                      }
+                    }
+                  },
+                  fail: (err) => {
+                    wx.hideLoading();
+                    wx.showToast({ title: '删除失败', icon: 'none' });
+                    console.error('删除打卡失败：', err);
+                  }
+                });
+              }, 300); // 给动画留出时间
+            } else {
+              // 未找到元素，直接调用云函数
+              wx.showLoading({ title: '删除中...' });
+              wx.cloud.callFunction({
+                name: 'deleteCheckin',
+                data: { checkinId, roomId: this.data.roomId },
+                success: (resp) => {
+                  wx.hideLoading();
+                  wx.showToast({ title: '删除成功', icon: 'success' });
+                  this.loadTodayCheckins();
+                  this.loadHistoryCheckins();
+                  
+                  const pages = getCurrentPages();
+                  for (let i = 0; i < pages.length; i++) {
+                    if (pages[i].route === 'pages/index/index') {
+                      const indexPage = pages[i];
+                      if (indexPage && indexPage.loadRoomData) {
+                        indexPage.loadRoomData(this.data.roomId);
+                      }
+                      break;
+                    }
+                  }
+                },
+                fail: (err) => {
+                  wx.hideLoading();
+                  wx.showToast({ title: '删除失败', icon: 'none' });
+                  console.error('删除打卡失败：', err);
+                }
+              });
             }
           });
         }
       }
     });
-  }
+  },
+
+  // 加载历史打卡数据
+  async loadHistoryCheckins() {
+    if (!this.data.roomId) return;
+
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'getHistoryCheckins',
+        data: {
+          openid: app.globalData.openid,
+          roomId: this.data.roomId
+        }
+      });
+
+      if (res.result && res.result.data) {
+        this.setData({
+          historyCheckins: res.result.data
+        });
+      }
+    } catch (err) {
+      console.error('获取历史打卡数据失败：', err);
+      wx.showToast({
+        title: '获取历史数据失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 处理swiper切换
+  swiperChange(e) {
+    this.setData({
+      currentSwiper: e.detail.current
+    });
+    
+    // 如果切换到历史打卡，确保数据已加载
+    if (e.detail.current === 1 && this.data.historyCheckins.length === 0) {
+      this.loadHistoryCheckins();
+    }
+  },
+
+  // 点击标题切换tab
+  switchTab(e) {
+    const index = e.currentTarget.dataset.index;
+    this.setData({
+      currentSwiper: index
+    });
+    
+    // 如果切换到历史打卡，确保数据已加载
+    if (index === 1 && this.data.historyCheckins.length === 0) {
+      this.loadHistoryCheckins();
+    }
+  },
+
+  // 加载主题设置
+  loadThemeSettings() {
+    const themeSettings = wx.getStorageSync('themeSettings') || { isDarkMode: false };
+    this.setData({
+      isDarkMode: themeSettings.isDarkMode
+    });
+    
+    // 应用主题设置
+    if (themeSettings.isDarkMode) {
+      wx.setNavigationBarColor({
+        frontColor: '#ffffff',
+        backgroundColor: '#121212'
+      });
+    } else {
+      wx.setNavigationBarColor({
+        frontColor: '#000000',
+        backgroundColor: '#f5f6fa'
+      });
+    }
+  },
+  
+  // 切换主题
+  toggleTheme() {
+    const newDarkMode = !this.data.isDarkMode;
+    this.setData({
+      isDarkMode: newDarkMode
+    });
+    
+    // 保存设置
+    wx.setStorageSync('themeSettings', { isDarkMode: newDarkMode });
+    
+    // 设置导航栏颜色
+    if (newDarkMode) {
+      wx.setNavigationBarColor({
+        frontColor: '#ffffff',
+        backgroundColor: '#121212'
+      });
+    } else {
+      wx.setNavigationBarColor({
+        frontColor: '#000000',
+        backgroundColor: '#f5f6fa'
+      });
+    }
+  },
 });

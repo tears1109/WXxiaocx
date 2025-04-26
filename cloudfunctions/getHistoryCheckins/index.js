@@ -37,46 +37,47 @@ exports.main = async (event) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    // 查询今日打卡记录（按房间筛选）
+    // 查询历史打卡记录（当天以前的，按房间筛选，按积分降序）
     const res = await db.collection('checkins').where({
       roomId,
-      checkinTime: _.gte(today)
-    }).get()
+      checkinTime: _.lt(today)
+    }).orderBy('score', 'desc').limit(50).get()
 
+    // 处理返回数据
     return {
       success: true,
-      checkins: res.data.map(item => ({
+      data: res.data.map(item => ({
         ...item,
-        checkinTime: formatTime(item.checkinTime)
+        checkinTime: formatDate(item.checkinTime)
       }))
     }
   } catch (e) {
-    console.error('获取打卡记录失败:', e)
+    console.error('获取历史打卡记录失败:', e)
     return {
       success: false,
-      message: e.message || '获取打卡记录失败'
+      message: e.message || '获取历史打卡记录失败'
     }
   }
 }
 
-// 格式化时间为中国标准时间 (UTC+8)
-function formatTime(date) {
-  const originalDate = new Date(date); // Create Date object from timestamp
-
-  // Calculate the offset for CST (UTC+8) in milliseconds
+// 格式化日期为 MM-DD HH:MM 格式
+function formatDate(date) {
+  const originalDate = new Date(date);
+  
+  // 计算中国标准时间 (UTC+8) 的偏移量（毫秒）
   const timezoneOffset = 8 * 60 * 60 * 1000;
-
-  // Create a new Date object adjusted for CST by adding the offset to the UTC time
+  
+  // 创建调整为CST的新Date对象
   const cstDate = new Date(originalDate.getTime() + timezoneOffset);
-
-  // Extract hours and minutes in UTC from the adjusted date
-  // This gives the correct time components for the CST timezone
+  
+  const month = cstDate.getUTCMonth() + 1;
+  const day = cstDate.getUTCDate();
   const hour = cstDate.getUTCHours();
   const minute = cstDate.getUTCMinutes();
-
-  return `${padZero(hour)}:${padZero(minute)}`;
+  
+  return `${padZero(month)}-${padZero(day)} ${padZero(hour)}:${padZero(minute)}`;
 }
 
 function padZero(n) {
   return n < 10 ? '0' + n : n
-}
+} 

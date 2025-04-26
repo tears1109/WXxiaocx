@@ -1,11 +1,18 @@
-<view class="container">
+<view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
   <!-- 头部 -->
   <view class="user-header">
     <view class="user-avatar-container">
       <image class="user-avatar" src="{{userInfo.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" bindtap="onAvatarTap" mode="aspectFill" />
-      <view class="user-info">
+      <view class="user-info" bindtap="onOtherTap">
         <text class="user-name">{{userInfo.nickName || '微信用户'}}</text>
         <text class="user-score">欢迎加入房间</text>
+      </view>
+      <!-- 主题切换按钮 -->
+      <view class="theme-toggle" bindtap="toggleTheme">
+        <view class="theme-icon">
+          <view class="{{isDarkMode ? 'moon-icon' : 'sun-icon'}}"></view>
+          <!-- <text>{{isDarkMode ? '浅色' : '深色'}}</text> -->
+        </view>
       </view>
     </view>
     <!-- 加入房间 -->
@@ -56,8 +63,8 @@
 </view>
 <!-- 侧边栏 -->
 <view wx:if="{{isSidebarVisible}}" class="sidebar-overlay" catchtap="closeSidebar">
-  <view class="sidebar-popup {{sidebarAnimClass}}" catchtap="stopTap">
-    <view class="sidebar-header">个人中心</view>
+  <view class="sidebar-popup {{isRightSidebar ? 'right-sidebar' : ''}} {{sidebarAnimClass}}  {{isDarkMode ? 'dark-sidebar' : ''}}" catchtap="stopTap">
+    <view class="sidebar-header">个人中心{{isRightSidebar}}</view>
     <view class="sidebar-body">
       <text>昵称：{{userInfo.nickName || '微信用户'}}</text>
     </view>

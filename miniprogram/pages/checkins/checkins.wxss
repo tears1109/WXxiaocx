@@ -1,22 +1,103 @@
 /* page.wxss */
+/* 浅色主题 (默认) */
+.light-mode {
+  --bg-color: #f5f6fa;
+  --card-bg: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --border-color: #f0f2f5;
+  --highlight-color: #6a11cb;
+  --highlight-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  --stats-bg: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  --card-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  --btn-shadow: 0 4rpx 12rpx rgba(106, 17, 203, 0.2);
+  --ranking-item-bg: white;
+  --ranking-item-self: rgba(106, 17, 203, 0.05);
+  --rank-number-bg: #f8f9fd;
+  --modal-overlay: rgba(0, 0, 0, 0.4);
+}
+
+/* 深色主题 */
+.dark-mode {
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #808080;
+  --border-color: #333333;
+  --highlight-color: #8a11cb;
+  --highlight-gradient: linear-gradient(135deg, #8a11cb 0%, #3585fc 100%);
+  --stats-bg: linear-gradient(135deg, #8a11cb 0%, #3585fc 100%);
+  --card-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+  --btn-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.4);
+  --ranking-item-bg: #2a2a2a;
+  --ranking-item-self: rgba(106, 17, 203, 0.15);
+  --rank-number-bg: #333333;
+  --modal-overlay: rgba(0, 0, 0, 0.7);
+}
+
 .container {
   display: flex;
   flex-direction: column;
   align-content: space-between;
-
   min-height: 100vh;
-  background-color: #f5f6fa;
+  background-color: var(--bg-color);
   padding: 24rpx;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+/* 主题切换按钮 */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.theme-icon {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: var(--highlight-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+}
+
+.sun-icon {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background-color: #ffeb3b;
+  box-shadow: 0 0 8rpx rgba(255, 235, 59, 0.8);
+}
+
+.moon-icon {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background-color: transparent;
+  box-shadow: inset 8rpx -8rpx 0 0 #ffffff;
+  transform: rotate(-30deg);
+}
+
+.theme-toggle text {
+  font-size: 24rpx;
+  color: var(--text-secondary);
 }
 
 .user-header {
   display: flex;
   align-items: center;
   padding: 32rpx;
-  background: white;
+  background: var(--card-bg);
   border-radius: 16rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  box-shadow: var(--card-shadow);
 }
 
 .user-avatar {
@@ -34,12 +115,12 @@
 .user-name {
   font-size: 36rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .user-status {
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .stats {
@@ -61,10 +142,10 @@
   position: fixed;
   bottom: 40rpx;
   right: 40rpx;
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  background: var(--highlight-gradient);
   border: none;
   font-size: 28rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  box-shadow: var(--btn-shadow);
   color: white;
   padding: 20rpx 40rpx;
   border-radius: 40rpx;
@@ -202,23 +283,23 @@
 
 /* 房间信息样式 */
 .room-info {
-  background: white;
+  background: var(--card-bg);
   border-radius: 16rpx;
   padding: 24rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  box-shadow: var(--card-shadow);
 }
 
 .room-name {
   font-size: 32rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 8rpx;
 }
 
 .room-desc {
   font-size: 28rpx;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
@@ -228,10 +309,10 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 16rpx;
   padding: 24rpx;
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  background: var(--stats-bg);
   border-radius: 16rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 12rpx rgba(106, 17, 203, 0.2);
+  box-shadow: var(--btn-shadow);
 }
 
 .stat-item {
@@ -279,25 +360,38 @@
 
 /* 排行榜样式 */
 .ranking-container {
-  background: white;
+  width: 90%;
+  background: var(--card-bg);
   border-radius: 16rpx;
   padding: 24rpx;
   margin-bottom: 120rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  box-shadow: var(--card-shadow);
   flex: 1;
+}
+
+.ranking-title-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 24rpx;
 }
 
 .ranking-title {
   font-size: 32rpx;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 24rpx;
+  color: var(--text-primary);
   padding-left: 16rpx;
-  border-left: 8rpx solid #6a11cb;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.ranking-title.active {
+  border-left: 8rpx solid var(--highlight-color);
+  color: var(--highlight-color);
 }
 
 .ranking-scroll {
   max-height: calc(100vh - 500rpx);
+  height: calc(100vh - 500rpx);
 }
 
 .ranking-list {
@@ -311,8 +405,8 @@
   padding: 24rpx;
   margin-bottom: 16rpx;
   border-radius: 12rpx;
-  background: white;
-  border: 2rpx solid #f0f2f5;
+  background: var(--ranking-item-bg);
+  border: 2rpx solid var(--border-color);
   transition: transform 0.2s ease;
 }
 
@@ -325,21 +419,21 @@
 }
 
 .ranking-item.self {
-  background: rgba(106, 17, 203, 0.05);
+  background: var(--ranking-item-self);
   border-color: rgba(106, 17, 203, 0.1);
 }
 
 .rank-number {
   width: 48rpx;
   height: 48rpx;
-  background: #f8f9fd;
+  background: var(--rank-number-bg);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 16rpx;
   font-weight: 600;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 24rpx;
 }
 
@@ -348,19 +442,19 @@
   gap: 16rpx;
   margin-top: 8rpx;
   font-size: 24rpx;
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 .checkin-content {
   font-size: 26rpx;
-  color: #666;
+  color: var(--text-secondary);
   margin-top: 8rpx;
 }
 
 .score {
   font-size: 32rpx;
   font-weight: 600;
-  color: #6a11cb;
+  color: var(--highlight-color);
   margin-left: auto;
 }
 
@@ -434,7 +528,7 @@
 .upload-btn {
   width: 100%;
   height: 100px;
-  border: 1px dashed #ddd;
+  border: 1px dashed var(--border-color);
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -445,13 +539,13 @@
 
 .upload-icon {
   font-size: 24px;
-  color: #999;
+  color: var(--text-tertiary);
   margin-bottom: 5px;
 }
 
 .upload-btn text:last-child {
   font-size: 14px;
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 /* 更新打卡按钮样式 */
@@ -483,7 +577,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--modal-overlay);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -493,7 +587,7 @@
 
 .modal-content {
   width: 80%;
-  background: white;
+  background: var(--card-bg);
   border-radius: 16rpx;
   overflow: hidden;
   animation: slideUp 0.3s ease;
@@ -503,8 +597,8 @@
   padding: 24rpx;
   font-size: 32rpx;
   font-weight: 600;
-  color: #333;
-  border-bottom: 2rpx solid #f0f2f5;
+  color: var(--text-primary);
+  border-bottom: 2rpx solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -512,7 +606,7 @@
 
 .close-btn {
   font-size: 40rpx;
-  color: #999;
+  color: var(--text-tertiary);
   padding: 0 16rpx;
 }
 
@@ -525,9 +619,11 @@
   height: 200rpx;
   padding: 16rpx;
   font-size: 28rpx;
-  border: 2rpx solid #f0f2f5;
+  border: 2rpx solid var(--border-color);
   border-radius: 8rpx;
   margin-bottom: 16rpx;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .duration-input {
@@ -535,17 +631,19 @@
   height: 80rpx;
   padding: 0 16rpx;
   font-size: 28rpx;
-  border: 2rpx solid #f0f2f5;
+  border: 2rpx solid var(--border-color);
   border-radius: 8rpx;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .modal-footer {
   padding: 24rpx;
-  border-top: 2rpx solid #f0f2f5;
+  border-top: 2rpx solid var(--border-color);
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  background: var(--highlight-gradient);
   color: white;
   font-size: 28rpx;
   padding: 20rpx 0;
@@ -579,20 +677,21 @@
 /* 打卡详情弹窗样式 */
 .detail-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 16rpx;
 }
 
 .detail-item text:first-child {
   font-size: 28rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-right: 10rpx;
 }
 
 .detail-item text:last-child {
   font-size: 28rpx;
-  color: #666;
+  color: var(--text-secondary);
+  flex: 1;
 }
 
 .preview-image {
@@ -615,4 +714,73 @@
   font-size: 24rpx;
   text-align: center;
   line-height: 32rpx;
+}
+
+/* 粒子动画画布 */
+.particle-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  /* 确保在最顶层 */
+  pointer-events: none;
+  /* 使其不阻挡点击事件 */
+}
+
+/* 添加滑动淡出动画样式 */
+.slide-out {
+  animation: slideOut 0.3s ease-out forwards;
+  overflow: hidden;
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+    max-height: 200px;
+  }
+
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* 可以添加更多动画样式供未来选择 */
+.scale-out {
+  animation: scaleOut 0.3s ease-out forwards;
+}
+
+@keyframes scaleOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.flip-out {
+  animation: flipOut 0.5s ease-out forwards;
+  transform-origin: center;
+}
+
+@keyframes flipOut {
+  0% {
+    transform: perspective(400px) rotateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: perspective(400px) rotateY(90deg);
+    opacity: 0;
+  }
 }
