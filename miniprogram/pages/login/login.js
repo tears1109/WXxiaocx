@@ -1,3 +1,4 @@
+// 获取应用实例
 const app = getApp()
 
 Page({
@@ -24,7 +25,7 @@ Page({
   },
 
   onLoad() {
-    // Check if user is already logged in
+    // 检查用户是否已登录
     if (app.checkLoginStatus()) {
       wx.redirectTo({
         url: '/pages/room/room'
@@ -32,14 +33,14 @@ Page({
       return;
     }
     
-    // Initialize screen dimensions
+    // 初始化屏幕尺寸
     const systemInfo = wx.getSystemInfoSync();
     this.setData({
       canvasWidth: systemInfo.windowWidth,
       canvasHeight: systemInfo.windowHeight
     });
     
-    // Initialize animations
+    // 初始化动画
     setTimeout(() => {
       this.setData({
         loginBoxAnimation: wx.createAnimation({
@@ -54,7 +55,7 @@ Page({
   },
 
   onReady() {
-    // Initialize canvas for code rain animation
+    // 初始化花瓣动画的画布
     this.initPetalCanvas();
   },
 
@@ -79,14 +80,14 @@ Page({
     }
   },
 
-  // Initialize petal canvas animation
+  // 初始化花瓣画布动画
   initPetalCanvas() {
     const query = wx.createSelectorQuery();
-    query.select('#petalCanvas')
+    query.select('#petalsCanvas')
       .fields({ node: true, size: true })
       .exec((res) => {
         if (!res[0] || !res[0].node) {
-          console.error('Failed to get canvas node');
+          console.error('获取画布节点失败');
           return;
         }
 
@@ -94,27 +95,27 @@ Page({
         const ctx = canvas.getContext('2d');
         const dpr = wx.getSystemInfoSync().pixelRatio;
         
-        // Set canvas dimensions
+        // 设置画布尺寸
         canvas.width = this.data.canvasWidth * dpr;
         canvas.height = this.data.canvasHeight * dpr;
         ctx.scale(dpr, dpr);
         
-        // Create code rain objects
+        // 创建代码雨对象
         this.createCodeRain(ctx, canvas);
       });
   },
 
-  // Create code rain animation
+  // 创建代码雨动画
   createCodeRain(ctx, canvas) {
-    // Chinese characters for code rain
+    // 代码雨使用的中文字符
     const symbols = '桃李春风一杯酒江湖夜雨十年灯';
     
-    // Colors for the characters
+    // 字符的颜色
     const colors = ['pink', 'lightblue', 'lightgreen'];
     
-    // Create rain drops
+    // 创建雨滴
     const rainDrops = [];
-    const columnCount = Math.floor(this.data.canvasWidth / 18); // Column count based on 18px font size
+    const columnCount = Math.floor(this.data.canvasWidth / 18); // 根据18px字体大小计算列数
     
     for (let i = 0; i < columnCount; i++) {
       rainDrops.push({
@@ -125,43 +126,43 @@ Page({
       });
     }
     
-    // Animation loop
+    // 动画循环
     let lastTime = Date.now();
     const animate = () => {
       const now = Date.now();
       const dt = now - lastTime;
       lastTime = now;
       
-      // Clear canvas with semi-transparent black for trail effect
+      // 用半透明黑色清除画布以产生轨迹效果
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, this.data.canvasWidth, this.data.canvasHeight);
       
-      // Update and draw each raindrop
+      // 更新并绘制每个雨滴
       rainDrops.forEach(drop => {
-        // Update position
+        // 更新位置
         drop.y += drop.speed * (dt / 16);
         
-        // Reset if off screen
+        // 如果超出屏幕则重置
         if (drop.y > this.data.canvasHeight) {
           drop.y = -20;
         }
         
-        // Draw the character
+        // 绘制字符
         const char = symbols[Math.floor(Math.random() * symbols.length)];
         ctx.fillStyle = drop.color;
         ctx.font = '18px monospace';
         ctx.fillText(char, drop.x, drop.y);
       });
       
-      // Continue animation loop
+      // 继续动画循环
       this.animationTimer = requestAnimationFrame(animate);
     };
     
-    // Start animation
+    // 开始动画
     animate();
   },
 
-  // Handle button ripple effect
+  // 处理按钮涟漪效果
   createRipple(e) {
     // 获取点击的触摸坐标
     const touch = e.touches[0];
@@ -202,40 +203,40 @@ Page({
     });
   },
 
-  // Handle login button click
+  // 处理登录按钮点击
   handleLogin() {
     // 防止重复点击
     if (this.data.loading) {
       return;
     }
     
-    // Show loading indicator
+    // 显示加载指示器
     wx.showLoading({
       title: '登录中...',
       mask: true
     });
     
-    // Set loading state
+    // 设置加载状态
     this.setData({ loading: true });
     
     const loginAttempt = (retry = false) => {
       app.loginWithWeixin()
         .then(result => {
           const { userInfo, openid } = result;
-          console.log('Login successful, openid:', openid);
+          console.log('登录成功，openid:', openid);
           
-          // Set user info to app global data
+          // 将用户信息设置到全局数据
           app.globalData.userInfo = userInfo;
           app.globalData.openid = openid;
           
-          // Hide loading and show success message
+          // 隐藏加载并显示成功消息
           wx.hideLoading();
           wx.showToast({
             title: '登录成功',
             icon: 'success'
           });
           
-          // Create exit animation
+          // 创建退出动画
           const exitAnimation = wx.createAnimation({
             duration: 800,
             timingFunction: 'ease-out'
@@ -246,7 +247,7 @@ Page({
             loginBoxAnimation: exitAnimation.export()
           });
           
-          // Navigate to main page after animation completes
+          // 动画完成后导航到主页
           setTimeout(() => {
             wx.redirectTo({
               url: '/pages/room/room'
@@ -254,7 +255,7 @@ Page({
           }, 1000);
         })
         .catch(err => {
-          console.error('Login failed:', err);
+          console.error('登录失败:', err);
           wx.hideLoading();
           
           // 如果是云开发未初始化的错误且没有重试过，则尝试一次重试
@@ -291,7 +292,7 @@ Page({
     loginAttempt();
   },
 
-  // Initialize the falling petals animation
+  // 初始化落花瓣动画
   initPetalCanvas: function() {
     const query = wx.createSelectorQuery();
     query.select('#petalsCanvas')
@@ -300,12 +301,12 @@ Page({
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
         
-        // Set canvas width and height to match screen
+        // 设置画布宽高以匹配屏幕
         const info = wx.getSystemInfoSync();
         canvas.width = info.windowWidth;
         canvas.height = info.windowHeight;
         
-        // Create petals
+        // 创建花瓣
         const petals = [];
         for (let i = 0; i < 30; i++) {
           petals.push({
@@ -319,7 +320,7 @@ Page({
           });
         }
         
-        // Animation loop
+        // 动画循环
         function animate() {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           
@@ -328,7 +329,7 @@ Page({
             ctx.translate(petal.x, petal.y);
             ctx.rotate((petal.rotate * Math.PI) / 180);
             
-            // Draw petal
+            // 绘制花瓣
             ctx.beginPath();
             ctx.globalAlpha = petal.opacity;
             ctx.fillStyle = "#ffccd5";
@@ -336,12 +337,12 @@ Page({
             ctx.fill();
             ctx.restore();
             
-            // Update position
+            // 更新位置
             petal.x += petal.speedX;
             petal.y += petal.speedY;
             petal.rotate += 0.5;
             
-            // Reset if off-screen
+            // 如果超出屏幕则重置
             if (petal.y > canvas.height) {
               petal.y = -petal.size;
               petal.x = Math.random() * canvas.width;
@@ -358,8 +359,9 @@ Page({
       });
   },
 
+  // 初始化动画效果
   initAnimations: function() {
-    // Add classes for fade-in animations with delay
+    // 添加带延迟的淡入动画类
     let titleEl = this.selectComponent('.title-text');
     let subtitleEl = this.selectComponent('.subtitle-text');
     let loginBoxEl = this.selectComponent('.login-box');
@@ -369,6 +371,7 @@ Page({
     if (loginBoxEl) loginBoxEl.addClass('fade-in');
   },
 
+  // 初始化粒子效果
   initParticles: function() {
     const particleCount = 30;
     let particles = [];
@@ -390,6 +393,7 @@ Page({
     });
   },
 
+  // 粒子动画效果
   animateParticles: function(canvas, ctx) {
     const self = this;
     
@@ -397,39 +401,33 @@ Page({
       ctx.clearRect(0, 0, self.data.canvasWidth, self.data.canvasHeight);
       
       const particles = self.data.particles;
-      let updatedParticles = [];
-      
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         
-        // Update position
-        p.x += p.speedX;
-        p.y += p.speedY;
-        
-        // Boundary check with wrapping
-        if (p.x < -p.size) p.x = self.data.canvasWidth + p.size;
-        if (p.x > self.data.canvasWidth + p.size) p.x = -p.size;
-        if (p.y < -p.size) p.y = self.data.canvasHeight + p.size;
-        if (p.y > self.data.canvasHeight + p.size) p.y = -p.size;
-        
-        // Draw particle
+        // 绘制粒子
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.opacity;
         ctx.fill();
         
-        updatedParticles.push(p);
+        // 更新位置
+        p.x += p.speedX;
+        p.y += p.speedY;
+        
+        // 边界检查和反弹
+        if (p.x < 0 || p.x > self.data.canvasWidth) {
+          p.speedX *= -1;
+        }
+        if (p.y < 0 || p.y > self.data.canvasHeight) {
+          p.speedY *= -1;
+        }
       }
       
-      self.setData({
-        particles: updatedParticles
-      });
-      
-      canvas.requestAnimationFrame(animate);
+      self.data.animationTimer = requestAnimationFrame(animate);
     }
     
-    canvas.requestAnimationFrame(animate);
+    animate();
   },
 
   // 加载主题设置

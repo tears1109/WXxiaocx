@@ -117,6 +117,7 @@
   border: 1px solid #ddd;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   background: #fff;
+  color: #333333;
 
 }
 

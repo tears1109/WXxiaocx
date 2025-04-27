@@ -30,9 +30,11 @@ Page({
   },
 
   onLoad(options) {
+    // 检查登录状态，未登录时会自动跳转登录页
     if (!app.checkLogin()) {
       return;
     }
+    
     // 设置当前用户 openid
     this.setData({ currentOpenid: app.globalData.openid });
     this.getUserData(app.globalData.openid);
@@ -51,9 +53,11 @@ Page({
 
   // 进入页面时更新数据
   onShow() {
+    // 检查登录状态，未登录时会自动跳转登录页
     if (!app.checkLogin()) {
       return;
     }
+    
     this.getUserData(app.globalData.openid);
     if (this.data.roomId) {
       this.loadRoomData(this.data.roomId);

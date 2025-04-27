@@ -6,7 +6,7 @@ Page({
     showCreateModal: false,
     roomName: '',
     roomList: [],
-    roomTypes: ['计分房间', '排行房间', '普通房间'],
+    roomTypes: ['计记分房间', '排行房间', '普通房间'],
     selectedRoomType: '',
     code: '',
     userInfo: {}, // 可通过 wx.getUserProfile 获取或全局 app.userInfo

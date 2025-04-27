@@ -1,5 +1,5 @@
 <view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
-  <!-- Particle animation canvas -->
+  <!-- 花瓣动画画布 -->
   <canvas type="2d" id="petalsCanvas" class="petals-canvas"></canvas>
   <!-- 主题切换按钮 -->
   <view class="theme-toggle" bindtap="toggleTheme">
@@ -8,24 +8,24 @@
     </view>
     <text>{{isDarkMode ? '浅色' : '深色'}}</text>
   </view>
-  <!-- Title container with animation -->
+  <!-- 标题容器与动画 -->
   <view class="title-container">
     <view class="title-text fade-in">微信小程序</view>
     <view class="subtitle-text fade-in-delayed">代码开源免费</view>
   </view>
-  <!-- Login box with fade-in animation -->
+  <!-- 登录框淡入动画 -->
   <view class="login-box fade-in">
     <view class="avatar-container">
       <image class="avatar" src="https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=0949834e659d7b0e6fa29adb5752d4cb&t=1745672829"></image>
     </view>
-    <!-- Login button with breathing effect -->
+    <!-- 带呼吸效果的登录按钮 -->
     <view class="btn-container" bindtap="handleLogin" bindtouchstart="createRipple" id="loginButton">
       <button class="login-btn breathing-btn">微信一键登录</button>
-      <!-- Ripple effect container -->
+      <!-- 涟漪效果容器 -->
       <view class="ripple" wx:if="{{showRipple}}" style="{{rippleStyle}}"></view>
     </view>
   </view>
-  <!-- Petals animation in the background -->
+  <!-- 背景花瓣动画 -->
   <view class="petals">
     <view class="petal petal-1"></view>
     <view class="petal petal-2"></view>

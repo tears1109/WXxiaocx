@@ -64,7 +64,7 @@
 <!-- 侧边栏 -->
 <view wx:if="{{isSidebarVisible}}" class="sidebar-overlay" catchtap="closeSidebar">
   <view class="sidebar-popup {{isRightSidebar ? 'right-sidebar' : ''}} {{sidebarAnimClass}}  {{isDarkMode ? 'dark-sidebar' : ''}}" catchtap="stopTap">
-    <view class="sidebar-header">个人中心{{isRightSidebar}}</view>
+    <view class="sidebar-header">个人中心</view>
     <view class="sidebar-body">
       <text>昵称：{{userInfo.nickName || '微信用户'}}</text>
     </view>
