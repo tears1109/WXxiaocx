@@ -1,0 +1,218 @@
+/* 浅色主题 (默认) */
+.light-mode {
+  --bg-color: #f5f6fa;
+  --card-bg: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --border-color: #f0f2f5;
+  --highlight-color: #6a11cb;
+  --highlight-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  --stats-bg: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  --card-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  --btn-shadow: 0 4rpx 12rpx rgba(106, 17, 203, 0.2);
+  --ranking-item-bg: white;
+  --ranking-item-self: rgba(106, 17, 203, 0.05);
+  --rank-number-bg: #f8f9fd;
+  --modal-overlay: #f8f9fd;
+  --sidebar-bg: white;
+  --first-item-bg: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  --positive-score-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+  --negative-score-gradient: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+}
+
+/* 深色主题 */
+.dark-mode {
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #808080;
+  --border-color: #333333;
+  --highlight-color: #8a11cb;
+  --highlight-gradient: linear-gradient(135deg, #8a11cb 0%, #3585fc 100%);
+  --stats-bg: linear-gradient(135deg, #8a11cb 0%, #3585fc 100%);
+  --card-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+  --btn-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.4);
+  --ranking-item-bg: #2a2a2a;
+  --ranking-item-self: rgba(106, 17, 203, 0.15);
+  --rank-number-bg: #333333;
+  --modal-overlay: #333333;
+  --sidebar-bg: #1e1e1e;
+  --first-item-bg: linear-gradient(135deg, #8a11cb 0%, #3585fc 100%);
+  --positive-score-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+  --negative-score-gradient: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+}
+
+/* 页面容器 */
+.page-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding: 24rpx;
+  transition: all 0.3s ease;
+}
+
+/* 页头 */
+.header {
+  width: 100%;
+  padding: 30rpx 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1rpx solid var(--border-color);
+  margin-bottom: 30rpx;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 用户列表 */
+.users-list {
+  width: 100%;
+  margin-bottom: 30rpx;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  background: var(--card-bg);
+  border-radius: 12rpx;
+  box-shadow: var(--card-shadow);
+  position: relative;
+  border: 2rpx solid var(--border-color);
+  transition: transform 0.2s ease;
+}
+
+.user-item:active {
+  transform: scale(0.98);
+}
+
+.user-item.selected {
+  border: 2rpx solid var(--highlight-color);
+  background: var(--ranking-item-self);
+}
+
+.user-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+  border: 4rpx solid rgba(106, 17, 203, 0.1);
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 36rpx;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.user-score {
+  font-size: 36rpx;
+  color: var(--text-secondary);
+  display: inline-block;
+  /* line-height: 1.2; */
+  /* height: 60rpx; */
+  vertical-align: middle;
+}
+
+/* 积分正负值样式 */
+.positive-score {
+  background: var(--positive-score-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding: 0 8rpx;
+  border-radius: 6rpx;
+  text-shadow: none;
+}
+
+.negative-score {
+  background: var(--negative-score-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding: 0 8rpx;
+  border-radius: 6rpx;
+  text-shadow: none;
+}
+
+.user-select {
+  margin-left: 20rpx;
+}
+
+/* 加分表单 */
+.points-form {
+  padding: 30rpx;
+  background: var(--card-bg);
+  border-radius: 16rpx;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 40rpx;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  font-size: 34rpx;
+  margin-bottom: 16rpx;
+  display: block;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  height: 88rpx;
+  border: 1rpx solid var(--border-color);
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 32rpx;
+  box-sizing: border-box;
+  background: var(--rank-number-bg);
+  color: var(--text-primary);
+}
+
+.submit-btn {
+  margin-top: 30rpx;
+  background: var(--highlight-gradient);
+  color: white;
+  border: none;
+  border-radius: 44rpx;
+  font-size: 36rpx;
+  box-shadow: var(--btn-shadow);
+  font-weight: 500;
+}
+
+.submit-btn::after {
+  border: none;
+}
+
+.submit-btn:active {
+  opacity: 0.9;
+}
+
+/* 未选择用户提示 */
+.no-selection {
+  padding: 60rpx;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 34rpx;
+  background: var(--card-bg);
+  border-radius: 16rpx;
+  box-shadow: var(--card-shadow);
+}

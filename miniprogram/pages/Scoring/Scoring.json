@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+  },
+  "navigationBarTitleText": "房间打卡",
+  "navigationBarBackgroundColor": "#ffffff",
+  "navigationBarTextStyle": "black",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f5f7fa"
+}

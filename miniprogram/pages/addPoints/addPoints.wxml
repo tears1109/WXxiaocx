@@ -1,0 +1,41 @@
+<wxs module="scoreStyle">
+  function getScoreClass(score) {
+    return score >= 0 ? 'positive-score' : 'negative-score';
+  }
+  module.exports = {
+    getScoreClass: getScoreClass
+  };
+</wxs>
+<view class="page-container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+  <view class="header">
+    <text class="title">给用户加分</text>
+  </view>
+  <!-- 用户列表 -->
+  <view class="users-list">
+    <block wx:for="{{users}}" wx:key="openid">
+      <view class="user-item {{selectedUserId === item.openid ? 'selected' : ''}}" bindtap="selectUser" data-openid="{{item.openid}}">
+        <image class="user-avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
+        <view class="user-info">
+          <text class="user-name">{{item.name}}</text>
+          <text class="user-score {{scoreStyle.getScoreClass(item.score)}}">
+            积分: {{item.score}}
+          </text>
+        </view>
+        <view class="user-select" wx:if="{{selectedUserId === item.openid}}">
+          <icon type="success" size="20" color="#07c160"></icon>
+        </view>
+      </view>
+    </block>
+  </view>
+  <!-- 加分表单 -->
+  <view class="points-form" wx:if="{{selectedUserId}}">
+    <view class="form-item">
+      <text class="form-label">分数:</text>
+      <input class="form-input" type="number" placeholder="请输入分数" value="{{points}}" bindinput="onPointsInput" />
+    </view>
+    <button class="submit-btn" bindtap="submitPoints">确认加分</button>
+  </view>
+  <view class="no-selection" wx:if="{{!selectedUserId}}">
+    <text>请先选择一个用户</text>
+  </view>
+</view>

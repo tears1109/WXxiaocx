@@ -1,0 +1,157 @@
+<!-- pages/index/index.wxml -->
+<wxs module="scoreStyle">
+  function getScoreClass(score) {
+    return score >= 0 ? 'positive-score' : 'negative-score';
+  }
+  module.exports = {
+    getScoreClass: getScoreClass
+  };
+</wxs>
+<view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+  <view class="page-container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+    <view class="fixed-content">
+      <!-- 主题切换按钮 -->
+      <!-- <view class="theme-toggle" bindtap="toggleTheme">
+      <view class="theme-icon">
+        <view class="{{isDarkMode ? 'moon-icon' : 'sun-icon'}}"></view>
+      </view>
+      <text>{{isDarkMode ? '切换到浅色' : '切换到深色'}}</text>
+    </view> -->
+      <!-- 刷新控制按钮 -->
+      <!-- <view class="refresh-controls">
+      <view class="refresh-btn" bindtap="loadRoomData" data-room-id="{{roomId}}">
+        <view class="refresh-icon {{isLoading ? 'refreshing' : ''}}"></view>
+        <text>刷新</text>
+      </view>
+      <view class="auto-refresh-toggle" bindtap="toggleAutoRefresh">
+        <text>自动刷新: {{isAutoRefreshEnabled ? '开' : '关'}}</text>
+      </view>
+    </view> -->
+      <!-- 个人信息头部 -->
+      <view class="user-header">
+        <image class="user-avatar" src="{{roomUser.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill" bindtap="onAvatarTap"></image>
+        <view class="user-info" bindtap="onOtherTap">
+          <text class="user-name">{{roomUser.name || '微信用户'}}</text>
+          <text class="user-score {{scoreStyle.getScoreClass(userScore)}}">积分: {{userScore}}</text>
+        </view>
+        <view class="user-rank">
+          <text class="rank-label">排名</text>
+          <text class="rank-value">{{userRank}}</text>
+        </view>
+      </view>
+      <!-- 房间信息 -->
+      <view class="room-header" wx:if="{{roomInfo}}">
+        <view class="room-header-left">
+          <text class="room-name">{{roomInfo.name || '未命名房间'}}</text>
+          <text class="room-type">{{roomInfo.type}}</text>
+        </view>
+        <view class="invite-code-wrapper" bindtap="copyInviteCode">
+          <text class="invite-label">邀请码：</text>
+          <text class="invite-code">{{roomInfo.code}}</text>
+        </view>
+      </view>
+      <view class="stats">
+        <text class="stats-item">参与人数: {{stats.users}}</text>
+        <!-- <text class="stats-item">打卡次数: {{stats.attempts}}</text> -->
+        <!-- <text class="stats-item">总分: {{stats.totalScore}}</text> -->
+      </view>
+    </view>
+    <view class="leaderboard">
+      <block wx:for="{{leaderboard}}" wx:key="index">
+        <view class="user-item {{index === 0 ? 'first' : ''}}" bindtap="showUserModal" data-item="{{item}}">
+          <text class="rank">{{index + 1}}</text>
+          <image class="avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
+          <view class="user-detail">
+            <text class="name">{{item.name}}</text>
+            <!-- <text class="attempts">操作{{item.attempts}}次</text> -->
+          </view>
+          <text class="score {{scoreStyle.getScoreClass(item.score)}}">{{item.score}} 分</text>
+        </view>
+      </block>
+    </view>
+    <view class="fixed-bottom">
+      <button class="checkin-button" bindtap="addPointsToUser">给用户加分</button>
+    </view>
+  </view>
+</view>
+<view wx:if="{{isSidebarVisible}}" class="sidebar-overlay" catchtap="closeSidebar">
+  <view class="sidebar-popup {{isRightSidebar ? 'right-sidebar' : ''}} {{sidebarAnimClass}}  {{isDarkMode ? 'dark-sidebar' : ''}}" catchtap="stopTap">
+    <view class="sidebar-header">个人中心</view>
+    <view class="sidebar-body">
+      <text>昵称：{{roomUser.name || '微信用户'}}</text>
+    </view>
+    <view class="sidebar-body" bindtap="exitRoom">
+      <text>退出房间</text>
+    </view>
+    <view class="sidebar-body" wx:if="{{isOwner}}" bindtap="openSettingsModal">
+      <text>设置</text>
+    </view>
+    <view class="sidebar-body" bindtap="navigateToProfile">
+      <text>修改资料</text>
+    </view>
+    <view class="sidebar-body" bindtap="handleLogout">
+      <text>退出登录</text>
+    </view>
+  </view>
+</view>
+<!-- 设置弹窗 -->
+<view wx:if="{{showSettingsModal}}" class="modal-overlay" catchtap="closeSettingsModal">
+  <view class="modal-popup {{isDarkMode ? 'dark-modal' : ''}}" catchtap="stopTap">
+    <view class="modal-header">打卡等级设置</view>
+    <view class="modal-body">
+      <block wx:for="{{settings}}" wx:key="index">
+        <view class="setting-item" data-index="{{index}}">
+          <input placeholder="时长(分钟)" data-index="{{index}}" data-key="duration" bindinput="onSettingInput" value="{{item.duration}}" />
+          <input placeholder="得分" data-index="{{index}}" data-key="points" bindinput="onSettingInput" value="{{item.points}}" />
+          <button wx:if="{{settings.length > 1}}" data-index="{{index}}" bindtap="removeLevel">
+            删除
+          </button>
+        </view>
+      </block>
+      <button wx:if="{{settings.length < 5}}" class="add-level-button" bindtap="addLevel">
+        添加等级
+      </button>
+    </view>
+    <view class="modal-footer">
+      <button class="footer-on-button" bindtap="closeSettingsModal">取消</button>
+      <button class="footer-button" bindtap="onSaveSettings">保存</button>
+    </view>
+  </view>
+</view>
+<!-- 用户详情弹窗 -->
+<view wx:if="{{showUserModal}}" class="modal-overlay" bindtap="hideUserModal">
+  <view class="modal-popup {{isDarkMode ? 'dark-modal' : ''}}" catchtap="stopTap">
+    <view class="modal-header">
+      <text>用户详情</text>
+      <view class="close-btn" bindtap="hideUserModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="detail-item">
+        <image class="avatar-large" src="{{selectedUser.avatarUrl}}" mode="aspectFill" />
+      </view>
+      <view class="detail-item">
+        <text>昵称：</text>
+        <text>{{selectedUser.name}}</text>
+      </view>
+      <view class="detail-item">
+        <text>积分：</text>
+        <block wx:if="{{selectedUser && selectedUser.score !== undefined && selectedUser.score !== null}}">
+          <text class="{{scoreStyle.getScoreClass(selectedUser.score)}}">{{selectedUser.score}}</text>
+        </block>
+        <block wx:else>
+          <text class="positive-score">0</text>
+        </block>
+      </view>
+      <!-- <view class="detail-item">
+        <text>打卡次数：</text>
+        <text>{{selectedUser.attempts}}</text>
+      </view> -->
+    </view>
+    <view class="modal-footer">
+      <button wx:if="{{isOwner && selectedUser.openid !== currentOpenid}}" class="footer-button-kick " bindtap="kickSelectedUser">
+        踢出
+      </button>
+      <button class="footer-button" bindtap="hideUserModal">关闭</button>
+    </view>
+  </view>
+</view>

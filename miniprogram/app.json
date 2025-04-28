@@ -6,7 +6,9 @@
     "pages/punchCard/punchCard",
     "pages/checkins/checkins",
     "pages/profile/profile",
-    "pages/login/login"
+    "pages/Scoring/Scoring",
+    "pages/login/login",
+    "pages/addPoints/addPoints"
   ],
   
   "window": {

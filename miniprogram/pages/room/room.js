@@ -6,7 +6,7 @@ Page({
     showCreateModal: false,
     roomName: '',
     roomList: [],
-    roomTypes: ['计记分房间', '排行房间', '普通房间'],
+    roomTypes: ['记分房间', '排行房间', '普通房间'],
     selectedRoomType: '',
     code: '',
     userInfo: {}, // 可通过 wx.getUserProfile 获取或全局 app.userInfo
@@ -284,8 +284,14 @@ Page({
       wx.navigateTo({
         url: `/pages/index/index?id=${room._id}`
       });
+    } else if (room && room.type === '记分房间') {
+      wx.navigateTo({
+        url: `/pages/Scoring/Scoring?id=${room._id}`
+      });
+     
     } else {
       // 其他类型房间的处理逻辑
+      
       wx.showToast({ title: '加入中...', icon: 'loading' });
       this.setData({ code: roomCode }, () => {
         this.onJoinRoom();
