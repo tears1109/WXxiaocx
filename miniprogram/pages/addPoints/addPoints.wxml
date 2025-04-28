@@ -1,41 +1,48 @@
-<wxs module="scoreStyle">
-  function getScoreClass(score) {
-    return score >= 0 ? 'positive-score' : 'negative-score';
-  }
-  module.exports = {
-    getScoreClass: getScoreClass
-  };
-</wxs>
-<view class="page-container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
-  <view class="header">
-    <text class="title">给用户加分</text>
+<!-- page.wxml -->
+<view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+  <!-- 房间信息 -->
+  <view class="room-header" wx:if="{{roomInfo}}">
+    <view class="room-header-left">
+      <text class="room-name">{{roomInfo.name || '未命名房间'}}</text>
+      <text class="room-type">{{roomInfo.type}}</text>
+    </view>
   </view>
-  <!-- 用户列表 -->
-  <view class="users-list">
-    <block wx:for="{{users}}" wx:key="openid">
-      <view class="user-item {{selectedUserId === item.openid ? 'selected' : ''}}" bindtap="selectUser" data-openid="{{item.openid}}">
-        <image class="user-avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
-        <view class="user-info">
-          <text class="user-name">{{item.name}}</text>
-          <text class="user-score {{scoreStyle.getScoreClass(item.score)}}">
-            积分: {{item.score}}
-          </text>
+  <!-- 统计信息 -->
+  <!-- <view class="stats-container">
+    <view class="stat-item">
+      <text class="stat-value">{{stats.totalScore}}</text>
+      <text class="stat-label">总积分</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.users}}</text>
+      <text class="stat-label">参与人数</text>
+    </view>
+  </view> -->
+  <!-- 加分记录列表 -->
+  <view class="record-list">
+    <block wx:for="{{records}}" wx:key="_id">
+      <view class="record-item">
+        <view class="record-header">
+          <image class="user-avatar" src="{{item.targetUser.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
+          <view class="user-info">
+            <text class="user-name">{{item.targetUser.name}}</text>
+            <text class="record-time">{{item.createTime}}</text>
+          </view>
+          <view class="score {{item.score > 0 ? 'positive' : 'negative'}}">
+            {{item.score > 0 ? '+' : ''}}{{item.score}}
+          </view>
         </view>
-        <view class="user-select" wx:if="{{selectedUserId === item.openid}}">
-          <icon type="success" size="20" color="#07c160"></icon>
+        <view class="record-footer">
+          <text class="operator">操作人：{{item.operator.name}}</text>
         </view>
       </view>
     </block>
   </view>
-  <!-- 加分表单 -->
-  <view class="points-form" wx:if="{{selectedUserId}}">
-    <view class="form-item">
-      <text class="form-label">分数:</text>
-      <input class="form-input" type="number" placeholder="请输入分数" value="{{points}}" bindinput="onPointsInput" />
-    </view>
-    <button class="submit-btn" bindtap="submitPoints">确认加分</button>
+  <!-- 加载更多 -->
+  <view class="loading-more" wx:if="{{hasMore}}">
+    <text>加载更多...</text>
   </view>
-  <view class="no-selection" wx:if="{{!selectedUserId}}">
-    <text>请先选择一个用户</text>
+  <view class="no-more" wx:else>
+    <text>没有更多记录了</text>
   </view>
 </view>

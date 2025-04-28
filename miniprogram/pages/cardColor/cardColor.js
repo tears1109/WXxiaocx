@@ -38,10 +38,12 @@ Page({
       'linear-gradient(135deg, #795548 0%, #4e342e 100%)', // 棕色渐变
       'linear-gradient(135deg, #607d8b 0%, #37474f 100%)', // 蓝灰色渐变
       'linear-gradient(135deg, #FF69A0 0%, #FFB7C5 100%)'   // 粉色渐变
-    ]
+    ],
+    users: []
   },
 
   onLoad(options) {
+    console.log('页面加载开始');
     // 检查登录状态，未登录时会自动跳转登录页
     if (!app.checkLogin()) {
       return;
@@ -61,6 +63,7 @@ Page({
     
     // 加载主题设置
     this.loadThemeSettings();
+    this.getUsers();
   },
 
   // 进入页面时更新数据
@@ -263,9 +266,9 @@ Page({
   },
 
   navigateToRoom() {
-    wx.navigateTo({
-      url: '/pages/room/room'
-    });
+    // wx.navigateTo({
+    //   url: '/pages/room/room'
+    // });
   },
 
   // 新增：处理退出登录
@@ -368,6 +371,7 @@ Page({
 
   // 新增：显示用户详情弹窗
   showUserModal(e) {
+    console.log('显示用户详情:', e.currentTarget.dataset.item);
     const user = e.currentTarget.dataset.item;
     this.setData({
       showUserModal: true,
@@ -442,22 +446,26 @@ Page({
 
   // 加载主题设置
   loadThemeSettings() {
-    const themeSettings = wx.getStorageSync('themeSettings') || { isDarkMode: false };
-    this.setData({
-      isDarkMode: themeSettings.isDarkMode
-    });
-    
-    // 应用主题设置
-    if (themeSettings.isDarkMode) {
-      wx.setNavigationBarColor({
-        frontColor: '#ffffff',
-        backgroundColor: '#121212'
+    try {
+      const themeSettings = wx.getStorageSync('themeSettings') || { isDarkMode: false };
+      this.setData({
+        isDarkMode: themeSettings.isDarkMode
       });
-    } else {
-      wx.setNavigationBarColor({
-        frontColor: '#000000',
-        backgroundColor: '#f5f6fa'
-      });
+      
+      // 应用主题设置
+      if (themeSettings.isDarkMode) {
+        wx.setNavigationBarColor({
+          frontColor: '#ffffff',
+          backgroundColor: '#121212'
+        });
+      } else {
+        wx.setNavigationBarColor({
+          frontColor: '#000000',
+          backgroundColor: '#f5f6fa'
+        });
+      }
+    } catch (err) {
+      console.error('加载主题设置失败:', err);
     }
   },
   
@@ -485,40 +493,44 @@ Page({
     }
   },
 
-  // 新增：设置用户卡片颜色
+  // 设置用户卡片颜色
   async setUserCardColor(e) {
     const color = e.currentTarget.dataset.color;
-    const targetOpenid = this.data.selectedUser.openid;
+    const targetOpenid = this.data.selectedUser._openid;
+    const currentUserOpenid = app.globalData.openid;
+    
+    // 检查权限
+    if (currentUserOpenid !== 'ow3S1644I7vbH0v13rsMu1QKvYqM') {
+      wx.showToast({
+        title: '您没有权限使用此功能',
+        icon: 'none'
+      });
+      return;
+    }
+
+    console.log('设置用户颜色:', { targetOpenid, color });
 
     try {
       wx.showLoading({ title: '设置中...' });
       const result = await wx.cloud.callFunction({
-        name: 'setUserCardColor',
+        name: 'updateUserColor',
         data: {
-          targetOpenid,
-          cardColor: color,
-          roomId: this.data.roomId
+          userId: targetOpenid,
+          cardColor: color
         }
       });
 
-      if (result.result && result.result.success) {
+      console.log('更新颜色结果:', result);
+
+      if (result.result && result.result.code === 0) {
         wx.showToast({
           title: '设置成功',
           icon: 'success'
         });
 
         // 更新本地数据
-        const updatedUser = {
-          ...this.data.selectedUser,
-          cardColor: color
-        };
-        this.setData({
-          selectedUser: updatedUser
-        });
-
-        // 更新排行榜中的用户数据
-        const leaderboard = this.data.leaderboard.map(user => {
-          if (user.openid === targetOpenid) {
+        const users = this.data.users.map(user => {
+          if (user._openid === targetOpenid) {
             return {
               ...user,
               cardColor: color
@@ -526,17 +538,53 @@ Page({
           }
           return user;
         });
-        this.setData({ leaderboard });
+        this.setData({ users });
 
-        // 重新加载房间数据以确保数据同步
-        this.loadRoomData(this.data.roomId);
+        // 更新选中的用户数据
+        this.setData({
+          selectedUser: {
+            ...this.data.selectedUser,
+            cardColor: color
+          }
+        });
       } else {
-        throw new Error(result.result?.message || '设置失败');
+        throw new Error(result.result?.msg || '设置失败');
       }
     } catch (err) {
       console.error('设置卡片颜色失败:', err);
       wx.showToast({
         title: err.message || '设置失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
+  },
+
+  // 获取所有用户
+  async getUsers() {
+    console.log('开始获取用户列表');
+    try {
+      wx.showLoading({ title: '加载中...' });
+      const res = await wx.cloud.callFunction({
+        name: 'getUsers'
+      });
+      
+      console.log('云函数返回结果:', res);
+      
+      if (res.result && res.result.code === 0) {
+        const users = res.result.data || [];
+        console.log('获取到的用户数据:', users);
+        this.setData({
+          users: users
+        });
+      } else {
+        throw new Error(res.result?.msg || '获取用户列表失败');
+      }
+    } catch (err) {
+      console.error('获取用户列表失败:', err);
+      wx.showToast({
+        title: err.message || '获取用户列表失败',
         icon: 'none'
       });
     } finally {

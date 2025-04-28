@@ -68,6 +68,9 @@
     <view class="sidebar-body">
       <text>昵称：{{userInfo.nickName || '微信用户'}}</text>
     </view>
+    <view class="sidebar-body" bindtap="navigateToCardColor" wx:if="{{isAdmin}}">
+      <text>卡片颜色</text>
+    </view>
     <view class="sidebar-body" bindtap="navigateToProfile">
       <text>修改资料</text>
     </view>

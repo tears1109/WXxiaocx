@@ -15,7 +15,7 @@ function generateChineseName() {
 // 云函数入口函数
 exports.main = async (event, context) => {
   const db = cloud.database()
-  const { openid, userInfo, lastLoginTime, loginOnly } = event
+  const { openid, userInfo, lastLoginTime, loginOnly, cardColor } = event
 
   try {
     const res = await db.collection('users').where({
@@ -33,11 +33,18 @@ exports.main = async (event, context) => {
         })
       } else {
         // 如果是更新资料操作，更新用户信息和登录时间
+        const updateData = {
+          userInfo: userInfo,
+          lastLoginTime: lastLoginTime
+        };
+        
+        // 如果提供了卡片颜色，则更新颜色
+        if (cardColor) {
+          updateData.cardColor = cardColor;
+        }
+        
         await db.collection('users').doc(res.data[0]._id).update({
-          data: {
-            userInfo: userInfo,
-            lastLoginTime: lastLoginTime
-          }
+          data: updateData
         })
       }
       
@@ -66,7 +73,8 @@ exports.main = async (event, context) => {
           _openid: openid,
           userInfo: initialUserInfo,
           registerTime: lastLoginTime,
-          lastLoginTime: lastLoginTime
+          lastLoginTime: lastLoginTime,
+          cardColor: cardColor || '#ffffff' // 默认白色
         }
       })
       

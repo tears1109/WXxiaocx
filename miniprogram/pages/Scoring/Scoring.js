@@ -31,7 +31,21 @@ Page({
     refreshRoomId: '',
     autoRefreshInterval: 1000, // 自动刷新间隔，默认10秒
     isAutoRefreshEnabled: true, // 是否启用自动刷新
-    refreshTimer: null // 刷新定时器引用
+    refreshTimer: null, // 刷新定时器引用
+    showAddPointsModal: false, // 控制加分弹窗显示
+    pointsToAdd: '', // 要加的分数
+    colorOptions: [
+      ' ', // 白色渐变
+      'linear-gradient(135deg, #ffeb3b 0%, #fbc02d 100%)', // 黄色渐变
+      'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)', // 绿色渐变
+      'linear-gradient(135deg, #2196f3 0%, #1565c0 100%)', // 蓝色渐变
+      'linear-gradient(135deg, #9c27b0 0%, #6a1b9a 100%)', // 紫色渐变
+      'linear-gradient(135deg, #f44336 0%, #c62828 100%)', // 红色渐变
+      'linear-gradient(135deg, #ff9800 0%, #ef6c00 100%)', // 橙色渐变
+      'linear-gradient(135deg, #795548 0%, #4e342e 100%)', // 棕色渐变
+      'linear-gradient(135deg, #607d8b 0%, #37474f 100%)', // 蓝灰色渐变
+      'linear-gradient(135deg, #FF69A0 0%, #FFB7C5 100%)'  // 粉色渐变
+    ]
   },
 
   onLoad(options) {
@@ -184,59 +198,43 @@ Page({
       if (roomRes.data) {
         const users = roomRes.data.users || [];
         
-        // 新增：从全局 users 集合拉取最新头像和昵称
+        // 获取用户信息
         let userInfoMap = {};
         if (users.length > 0) {
           const openids = users.map(u => u.openid);
           const userDocs = await db.collection('users').where({
             _openid: db.command.in(openids)
           }).get();
+          
           userDocs.data.forEach(doc => {
-            userInfoMap[doc._openid] = doc.userInfo || {};
+            userInfoMap[doc._openid] = {
+              ...doc.userInfo,
+              cardColor: doc.cardColor || ''
+            };
           });
         }
-        
-        // 获取该房间的所有打卡记录
-        const checkinsRes = await db.collection('checkins')
-          .where({
-            roomId: roomId
-          })
-          .get();
-        
-        const checkins = checkinsRes.data || [];
-        
-        // 统计每个用户的打卡次数和分数
-        const userAttempts = {};
-        const userScores = {};
-        
-        checkins.forEach(checkin => {
-          const userOpenid = checkin.openid;
-          // 更新打卡次数
-          userAttempts[userOpenid] = (userAttempts[userOpenid] || 0) + 1;
-          // 更新用户总分 - 从打卡记录中累加分数
-          userScores[userOpenid] = (userScores[userOpenid] || 0) + (Number(checkin.score) || 0);
-        });
         
         // 处理用户数据
         const sortedUsers = users.map(user => {
           const globalInfo = userInfoMap[user.openid] || {};
-          console.log(666,globalInfo.nickName);
           
           return {
             name: globalInfo.nickName || user.userName || '未知用户',
             avatarUrl: globalInfo.avatarUrl || user.avatarUrl || '',
-            // 使用从打卡记录中计算的分数，而不是room中存储的分数
-            score: userScores[user.openid] || 0,
-            attempts: userAttempts[user.openid] || 0,
-            lastCheckin: user.lastCheckin,
-            openid: user.openid
+            score: user.score || 0,
+            openid: user.openid,
+            cardColor: globalInfo.cardColor || ''
           };
         }).sort((a, b) => b.score - a.score);
 
         // 计算当前用户的排名和分数
         const currentUserIndex = sortedUsers.findIndex(user => user.openid === app.globalData.openid);
         const currentUser = sortedUsers[currentUserIndex];
-        const roomUser = currentUser ? { name: currentUser.name, avatarUrl: currentUser.avatarUrl } : { name: '', avatarUrl: '' };
+        const roomUser = currentUser ? { 
+          name: currentUser.name, 
+          avatarUrl: currentUser.avatarUrl,
+          cardColor: currentUser.cardColor
+        } : { name: '', avatarUrl: '', cardColor: '' };
         const userRank = currentUserIndex !== -1 ? currentUserIndex + 1 : '-';
         const userScore = currentUser ? currentUser.score : 0;
 
@@ -247,7 +245,6 @@ Page({
           userRank: userRank,
           stats: {
             users: users.length,
-            attempts: checkins.length,
             totalScore: sortedUsers.reduce((sum, user) => sum + user.score, 0)
           },
           roomUser: roomUser,
@@ -338,7 +335,7 @@ Page({
   },
 
   // 添加给用户加分功能
-  addPointsToUser() {
+  navigateToCheckins() {
     wx.navigateTo({
       url: `/pages/addPoints/addPoints?roomId=${this.data.roomId}`
     });
@@ -578,6 +575,216 @@ Page({
         frontColor: '#000000',
         backgroundColor: '#f5f6fa'
       });
+    }
+  },
+
+  // 新增：给选中用户加分
+  addPointsToSelectedUser() {
+    wx.showModal({
+      title: '给用户加分',
+      content: '请输入要加的分数',
+      editable: true,
+      placeholderText: '请输入分数',
+      success: async (res) => {
+        if (res.confirm) {
+          const score = Number(res.content);
+          if (isNaN(score)) {
+            wx.showToast({
+              title: '请输入有效数字',
+              icon: 'none'
+            });
+            return;
+          }
+          
+          try {
+            wx.showLoading({ title: '加分中...' });
+            await wx.cloud.callFunction({
+              name: 'addScore',
+              data: {
+                roomId: this.data.roomId,
+                targetOpenid: this.data.selectedUser.openid,
+                score: score
+              }
+            });
+            
+            wx.hideLoading();
+            wx.showToast({
+              title: '加分成功',
+              icon: 'success'
+            });
+            
+            // 刷新数据
+            this.loadRoomData(this.data.roomId);
+          } catch (err) {
+            wx.hideLoading();
+            wx.showToast({
+              title: '加分失败',
+              icon: 'none'
+            });
+            console.error('加分失败：', err);
+          }
+        }
+      }
+    });
+  },
+
+  // 显示加分弹窗
+  showAddPointsModal(e) {
+    const user = e.currentTarget.dataset.item;
+    
+    // 检查是否给自己加分
+    if (user.openid === this.data.currentOpenid) {
+      wx.showToast({
+        title: '不能给自己加分',
+        icon: 'none'
+      });
+      return;
+    }
+
+    this.setData({
+      showAddPointsModal: true,
+      pointsToAdd: '',
+      selectedUser: user
+    });
+  },
+
+  // 隐藏加分弹窗
+  hideAddPointsModal() {
+    this.setData({
+      showAddPointsModal: false,
+      pointsToAdd: ''
+    });
+  },
+
+  // 输入分数
+  onPointsInput(e) {
+    this.setData({
+      pointsToAdd: e.detail.value
+    });
+  },
+
+  // 确认加分
+  async confirmAddPoints() {
+    const score = Number(this.data.pointsToAdd);
+    if (isNaN(score)) {
+      wx.showToast({
+        title: '请输入有效数字',
+        icon: 'none'
+      });
+      return;
+    }
+
+    try {
+      wx.showLoading({ title: '加分中...' });
+      console.log('发送加分请求:', {
+        roomId: this.data.roomId,
+        targetOpenid: this.data.selectedUser.openid,
+        score: score
+      });
+
+      const result = await wx.cloud.callFunction({
+        name: 'addScore',
+        data: {
+          roomId: this.data.roomId,
+          targetOpenid: this.data.selectedUser.openid,
+          score: score
+        }
+      });
+
+      console.log('加分结果:', result);
+
+      if (!result.result || !result.result.success) {
+        throw new Error(result.result?.message || '加分失败');
+      }
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '加分成功',
+        icon: 'success'
+      });
+
+      // 关闭弹窗
+      this.hideAddPointsModal();
+      
+      // 强制刷新数据
+      await this.loadRoomData(this.data.roomId);
+      
+      // 如果当前显示的是被加分用户的详情，也更新详情数据
+      if (this.data.showUserModal && this.data.selectedUser.openid === this.data.selectedUser.openid) {
+        const updatedUser = this.data.leaderboard.find(user => user.openid === this.data.selectedUser.openid);
+        if (updatedUser) {
+          this.setData({
+            selectedUser: updatedUser
+          });
+        }
+      }
+    } catch (err) {
+      console.error('加分失败，详细错误:', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: err.message || '加分失败',
+        icon: 'none',
+        duration: 2000
+      });
+    }
+  },
+
+  // 设置用户卡片颜色
+  async setUserCardColor(e) {
+    const color = e.currentTarget.dataset.color;
+    const targetOpenid = this.data.selectedUser.openid;
+
+    try {
+      wx.showLoading({ title: '设置中...' });
+      const result = await wx.cloud.callFunction({
+        name: 'setUserCardColor',
+        data: {
+          targetOpenid,
+          cardColor: color,
+          roomId: this.data.roomId
+        }
+      });
+
+      if (result.result && result.result.success) {
+        wx.showToast({
+          title: '设置成功',
+          icon: 'success'
+        });
+
+        // 更新本地数据
+        const updatedUser = {
+          ...this.data.selectedUser,
+          cardColor: color
+        };
+        this.setData({
+          selectedUser: updatedUser
+        });
+
+        // 更新排行榜中的用户数据
+        const leaderboard = this.data.leaderboard.map(user => {
+          if (user.openid === targetOpenid) {
+            return {
+              ...user,
+              cardColor: color
+            };
+          }
+          return user;
+        });
+        this.setData({ leaderboard });
+
+        // 重新加载房间数据以确保数据同步
+        this.loadRoomData(this.data.roomId);
+      } else {
+        throw new Error(result.result?.message || '设置失败');
+      }
+    } catch (err) {
+      console.error('设置卡片颜色失败:', err);
+      wx.showToast({
+        title: err.message || '设置失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
     }
   },
 });

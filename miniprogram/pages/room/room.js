@@ -26,16 +26,23 @@ Page({
     loading: true,
     sidebarOpen: false,
     isDarkMode: false,  // 添加深色模式标志
+    currentOpenid: '',
+    isAdmin: false,
   },
 
   onLoad() {
+    // 检查登录状态
     if (!app.checkLogin()) {
       return;
     }
-    // 确保获取并设置正确的openid
-    this.setData({
-      openid: app.globalData.openid
+    
+    // 设置当前用户 openid
+    this.setData({ 
+      currentOpenid: app.globalData.openid,
+      isAdmin: app.globalData.openid === 'ow3S1644I7vbH0v13rsMu1QKvYqM'
     });
+    
+    // 获取用户数据
     this.getUserData(app.globalData.openid);
     this.queryRoom();
     this.loadThemeSetting();
@@ -102,6 +109,14 @@ Page({
   navigateToProfile() {
     wx.navigateTo({
       url: '/pages/profile/profile',
+    });
+    this.closeSidebar();
+  },
+
+  // 导航到卡片颜色设置页
+  navigateToCardColor() {
+    wx.navigateTo({
+      url: '/pages/cardColor/cardColor',
     });
     this.closeSidebar();
   },

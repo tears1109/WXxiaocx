@@ -1,0 +1,48 @@
+<!-- pages/index/index.wxml -->
+<view class="page-container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+  <view class="fixed-content">
+    
+    <!-- 页面标题 -->
+    <view class="page-header">
+      <text class="page-title">用户列表</text>
+    </view>
+  </view>
+  <!-- 用户列表 -->
+  <view class="user-list">
+    <block wx:for="{{users}}" wx:key="openid">
+      <view class="user-item" bindtap="showUserModal" data-item="{{item}}" style="{{item.cardColor ? 'background: ' + item.cardColor : ''}}">
+        <image class="avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
+        <view class="user-detail">
+          <text class="name">{{item.nickName || '微信用户'}}</text>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>
+<!-- 用户详情弹窗 -->
+<view wx:if="{{showUserModal}}" class="modal-overlay" bindtap="hideUserModal">
+  <view class="modal-popup {{isDarkMode ? 'dark-modal' : ''}}" catchtap="stopTap">
+    <view class="modal-header">
+      <text>用户详情</text>
+      <view class="close-btn" bindtap="hideUserModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="detail-item">
+        <image class="avatar-large" src="{{selectedUser.avatarUrl}}" mode="aspectFill" />
+      </view>
+      <view class="detail-item">
+        <text>昵称：</text>
+        <text>{{selectedUser.nickName || '微信用户'}}</text>
+      </view>
+      <view class="detail-item">
+        <text>卡片颜色：</text>
+        <view class="color-picker">
+          <view class="color-item {{selectedUser.cardColor === color ? 'active' : ''}}" wx:for="{{colorOptions}}" wx:key="*this" wx:for-item="color" style="background: {{color}}" bindtap="setUserCardColor" data-color="{{color}}"></view>
+        </view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="footer-button" bindtap="hideUserModal">关闭</button>
+    </view>
+  </view>
+</view>

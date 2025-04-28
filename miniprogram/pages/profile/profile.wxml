@@ -5,12 +5,12 @@
 
   <view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
     <!-- 主题切换按钮 -->
-    <view class="theme-toggle" bindtap="toggleTheme">
+    <!-- <view class="theme-toggle" bindtap="toggleTheme">
       <view class="theme-icon">
         <view class="{{isDarkMode ? 'moon-icon' : 'sun-icon'}}"></view>
       </view>
       <text>{{isDarkMode ? '浅色' : '深色'}}</text>
-    </view>
+    </view> -->
     <!-- 头像和昵称区域 -->
     <view class="userinfo">
       <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">

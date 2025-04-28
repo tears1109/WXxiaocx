@@ -58,20 +58,22 @@
     </view>
     <view class="leaderboard">
       <block wx:for="{{leaderboard}}" wx:key="index">
-        <view class="user-item {{index === 0 ? 'first' : ''}}" bindtap="showUserModal" data-item="{{item}}">
+        <view class="user-item {{index === 0 ? 'first' : ''}}" bindtap="showUserModal" data-item="{{item}}" style="background: {{item.cardColor || 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'}}">
           <text class="rank">{{index + 1}}</text>
           <image class="avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
           <view class="user-detail">
             <text class="name">{{item.name}}</text>
-            <!-- <text class="attempts">操作{{item.attempts}}次</text> -->
           </view>
           <text class="score {{scoreStyle.getScoreClass(item.score)}}">{{item.score}} 分</text>
+          <button class="add-points-btn" catchtap="showAddPointsModal" data-item="{{item}}" wx:if="{{ item.openid !== currentOpenid}}">
+            加分
+          </button>
         </view>
       </block>
     </view>
-    <view class="fixed-bottom">
-      <button class="checkin-button" bindtap="addPointsToUser">给用户加分</button>
-    </view>
+  </view>
+  <view class="fixed-bottom">
+    <button class="checkin-button" bindtap="navigateToCheckins">加分记录</button>
   </view>
 </view>
 <view wx:if="{{isSidebarVisible}}" class="sidebar-overlay" catchtap="closeSidebar">
@@ -83,9 +85,9 @@
     <view class="sidebar-body" bindtap="exitRoom">
       <text>退出房间</text>
     </view>
-    <view class="sidebar-body" wx:if="{{isOwner}}" bindtap="openSettingsModal">
+    <!-- <view class="sidebar-body" wx:if="{{isOwner}}" bindtap="openSettingsModal">
       <text>设置</text>
-    </view>
+    </view> -->
     <view class="sidebar-body" bindtap="navigateToProfile">
       <text>修改资料</text>
     </view>
@@ -136,22 +138,52 @@
       <view class="detail-item">
         <text>积分：</text>
         <block wx:if="{{selectedUser && selectedUser.score !== undefined && selectedUser.score !== null}}">
-          <text class="{{scoreStyle.getScoreClass(selectedUser.score)}}">{{selectedUser.score}}</text>
+          <text class="{{scoreStyle.getScoreClass(selectedUser.score)}}">
+            {{selectedUser.score}}
+          </text>
         </block>
         <block wx:else>
           <text class="positive-score">0</text>
         </block>
       </view>
-      <!-- <view class="detail-item">
-        <text>打卡次数：</text>
-        <text>{{selectedUser.attempts}}</text>
+      <!-- <view class="detail-item" wx:if="{{isOwner}}">
+        <text>卡片颜色：</text>
+        <view class="color-picker">
+          <view class="color-item {{selectedUser.cardColor === color ? 'active' : ''}}" wx:for="{{colorOptions}}" wx:key="*this" wx:for-item="color" style="background: {{color}}" bindtap="setUserCardColor" data-color="{{color}}"></view>
+        </view>
       </view> -->
     </view>
     <view class="modal-footer">
-      <button wx:if="{{isOwner && selectedUser.openid !== currentOpenid}}" class="footer-button-kick " bindtap="kickSelectedUser">
+      <button wx:if="{{isOwner && selectedUser.openid !== currentOpenid}}" class="footer-button-kick" bindtap="kickSelectedUser">
         踢出
       </button>
       <button class="footer-button" bindtap="hideUserModal">关闭</button>
+    </view>
+  </view>
+</view>
+<!-- 加分弹窗 -->
+<view wx:if="{{showAddPointsModal}}" class="modal-overlay" bindtap="hideAddPointsModal">
+  <view class="modal-popup {{isDarkMode ? 'dark-modal' : ''}}" catchtap="stopTap">
+    <view class="modal-header">
+      <text>给用户加分</text>
+      <view class="close-btn" bindtap="hideAddPointsModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="add-points-form">
+        <view class="form-item">
+          <text>用户：{{selectedUser.name}}</text>
+        </view>
+        <view class="form-item">
+          <text>当前积分：{{selectedUser.score || 0}}</text>
+        </view>
+        <view class="form-item">
+          <input type="number" placeholder="请输入要加的分数" bindinput="onPointsInput" value="{{pointsToAdd}}" />
+        </view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="footer-on-button" bindtap="hideAddPointsModal">取消</button>
+      <button class="footer-button" bindtap="confirmAddPoints">确定</button>
     </view>
   </view>
 </view>

@@ -89,7 +89,9 @@
   flex-direction: column;
   min-height: 100vh;
   background-color: var(--bg-color);
-  padding-top: 550rpx;
+  padding: 0 20rpx;
+
+  padding-top: 80rpx ;
   transition: all 0.3s ease;
 }
 
@@ -102,6 +104,7 @@
   z-index: 100;
   padding: 24rpx;
   background-color: var(--bg-color);
+  color: #fff;
   transition: all 0.3s ease;
 }
 

@@ -11,7 +11,7 @@
   <!-- 标题容器与动画 -->
   <view class="title-container">
     <view class="title-text fade-in">微信小程序</view>
-    <view class="subtitle-text fade-in-delayed">代码开源免费</view>
+    <view class="subtitle-text fade-in-delayed">昨夜闲潭梦落花</view>
   </view>
   <!-- 登录框淡入动画 -->
   <view class="login-box fade-in">
