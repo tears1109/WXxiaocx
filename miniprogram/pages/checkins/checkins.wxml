@@ -1,0 +1,146 @@
+<!-- page.wxml -->
+<view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+  <!-- 房间信息 -->
+  <!-- <view class="room-info" wx:if="{{roomInfo}}">
+    <view class="room-name">{{roomInfo.name}}</view>
+    <view class="room-desc">{{roomInfo.description}}</view>
+  </view> -->
+  <!-- 用户信息 -->
+  <!-- <view class="user-header">
+    <image class="user-avatar" src="{{userInfo.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
+    <view class="user-info">
+      <text class="user-name">{{userInfo.nickName || '微信用户'}}</text>
+    </view>
+  </view> -->
+  <!-- 主题切换按钮 -->
+  <!-- <view class="theme-toggle" bindtap="toggleTheme">
+    <view class="theme-icon">
+      <view class="{{isDarkMode ? 'moon-icon' : 'sun-icon'}}"></view>
+    </view>
+    <text>{{isDarkMode ? '切换到浅色' : '切换到深色'}}</text>
+  </view> -->
+  <!-- 打卡统计 -->
+  <view class="stats-container">
+    <view class="stat-item">
+      <text class="stat-value">{{stats.todayUsers}}</text>
+      <text class="stat-label">今日打卡</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.totalScore}}</text>
+      <text class="stat-label">总积分</text>
+    </view>
+  </view>
+  <!-- 今日打卡列表 -->
+  <view class="ranking-container">
+    <view class="ranking-title-container">
+      <view class="ranking-title {{currentSwiper === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0">
+        今日打卡榜
+      </view>
+      <view class="ranking-title {{currentSwiper === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">
+        历史打卡榜
+      </view>
+    </view>
+    <swiper class="ranking-scroll" bindchange="swiperChange" current="{{currentSwiper}}">
+      <swiper-item>
+        <scroll-view scroll-y style="height: 100%;">
+          <view class="ranking-list">
+            <block wx:for="{{todayCheckins}}" wx:key="_id">
+              <view id="checkin-{{item._id}}" class="ranking-item {{item.openid === currentOpenid ? 'self' : ''}} {{itemToDelete === 'checkin-'+item._id ? 'slide-out' : ''}}" bindtap="showContentModal" data-content="{{item.content}}" data-duration="{{item.duration}}" data-image="{{item.image}}">
+                <view class="rank-number">{{index + 1}}</view>
+                <image class="user-avatar" src="{{item.avatarUrl}}" mode="aspectFill"></image>
+                <view class="user-info">
+                  <text class="user-name">{{item.userName}}</text>
+                  <view class="checkin-details">
+                    <text class="checkin-time">{{item.checkinTime}}</text>
+                    <text class="checkin-duration">{{item.duration}}分钟</text>
+                  </view>
+                  <text class="checkin-content">{{item.content}}</text>
+                </view>
+                <view class="score">{{item.score}}分</view>
+                <view class="delete-btn" wx:if="{{item.openid === currentOpenid || roomInfo.createdBy === currentOpenid}}" catchtap="deleteCheckin" data-id="{{item._id}}">
+                  ×
+                </view>
+              </view>
+            </block>
+          </view>
+        </scroll-view>
+      </swiper-item>
+      <swiper-item>
+        <scroll-view scroll-y style="height: 100%;">
+          <view class="ranking-list">
+            <block wx:for="{{historyCheckins}}" wx:key="_id">
+              <view id="checkin-{{item._id}}" class="ranking-item {{item.openid === currentOpenid ? 'self' : ''}} {{itemToDelete === 'checkin-'+item._id ? 'slide-out' : ''}}" bindtap="showContentModal" data-content="{{item.content}}" data-duration="{{item.duration}}" data-image="{{item.image}}">
+                <view class="rank-number">{{index + 1}}</view>
+                <image class="user-avatar" src="{{item.avatarUrl}}" mode="aspectFill"></image>
+                <view class="user-info">
+                  <text class="user-name">{{item.userName}}</text>
+                  <view class="checkin-details">
+                    <text class="checkin-time">{{item.checkinTime}}</text>
+                    <text class="checkin-duration">{{item.duration}}分钟</text>
+                  </view>
+                  <text class="checkin-content">{{item.content}}</text>
+                </view>
+                <view class="score">{{item.score}}分</view>
+                <view class="delete-btn" wx:if="{{item.openid === currentOpenid || roomInfo.createdBy === currentOpenid}}" catchtap="deleteCheckin" data-id="{{item._id}}">
+                  ×
+                </view>
+              </view>
+            </block>
+          </view>
+        </scroll-view>
+      </swiper-item>
+    </swiper>
+  </view>
+  <!-- 打卡按钮 -->
+  <button class="checkin-button" bindtap="showCheckinModal">今日打卡</button>
+  <!-- 打卡弹窗 -->
+  <view class="modal-overlay" wx:if="{{showCheckinModal}}" bindtap="hideCheckinModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text>打卡</text>
+        <view class="close-btn" bindtap="hideCheckinModal">×</view>
+      </view>
+      <view class="modal-body">
+        <textarea class="content-input" placeholder="请输入打卡内容..." value="{{checkinContent}}" bindinput="onContentInput" maxlength="200"></textarea>
+        <input class="duration-input" type="number" placeholder="请输入打卡时长（分钟）" value="{{duration}}" bindinput="onDurationInput" />
+        <!-- 添加图片上传区域 -->
+        <view class="image-upload-section">
+          <view class="image-preview" wx:if="{{checkinImage}}">
+            <image src="{{checkinImage}}" mode="aspectFill" bindtap="previewImage"></image>
+            <view class="delete-image" bindtap="deleteImage">×</view>
+          </view>
+          <view class="upload-btn" bindtap="chooseImage" wx:if="{{!checkinImage}}">
+            <text class="upload-icon">+</text>
+            <text>上传图片</text>
+          </view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="submit-btn" bindtap="submitCheckin">确认打卡</button>
+      </view>
+    </view>
+  </view>
+  <!-- 查看打卡内容弹窗 -->
+  <view class="modal-overlay" wx:if="{{showContentModal}}" bindtap="hideContentModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text>打卡详情</text>
+        <view class="close-btn" bindtap="hideContentModal">×</view>
+      </view>
+      <view class="modal-body">
+        <view class="detail-item">
+          <text>内容：</text>
+          <text>{{selectedContent}}</text>
+        </view>
+        <view class="detail-item">
+          <text>时长：</text>
+          <text>{{selectedDuration}} 分钟</text>
+        </view>
+        <image wx:if="{{selectedImage}}" src="{{selectedImage}}" mode="aspectFill" class="preview-image" bindtap="previewImageByUrl" data-url="{{selectedImage}}" />
+      </view>
+      <view class="modal-footer">
+        <button class="submit-btn" bindtap="hideContentModal">关闭</button>
+      </view>
+    </view>
+  </view>
+</view>

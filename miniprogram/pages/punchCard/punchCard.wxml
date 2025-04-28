@@ -1,0 +1,27 @@
+<!-- personal-checkin.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">我的打卡记录</text>
+  </view>
+  <view class="stats-card">
+    <text class="stats-title">本月累计打卡</text>
+    <text class="stats-value">{{totalCheckins}}次</text>
+    <text class="stats-duration">总时长 {{totalDuration}}小时</text>
+  </view>
+  <view class="checkin-list">
+    <block wx:for="{{checkinRecords}}" wx:key="index">
+      <view class="record-item {{item.type === 'work' ? 'type-work' : 'type-study'}}">
+        <view class="record-type-label">{{item.type === 'work' ? '工作' : '学习'}}</view>
+        <view class="record-info">
+          <text class="record-name">{{item.name}}</text>
+          <text class="record-date">{{item.date}}</text>
+        </view>
+        <view class="record-duration">
+          <text class="duration-value">{{item.duration}}</text>
+          <text class="duration-unit">小时</text>
+        </view>
+      </view>
+    </block>
+  </view>
+  <button class="checkin-button" bindtap="doCheckin">立即打卡</button>
+</view>

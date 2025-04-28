@@ -1,0 +1,78 @@
+<view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+  <!-- 头部 -->
+  <view class="user-header">
+    <view class="user-avatar-container">
+      <image class="user-avatar" src="{{userInfo.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" bindtap="onAvatarTap" mode="aspectFill" />
+      <view class="user-info" bindtap="onOtherTap">
+        <text class="user-name">{{userInfo.nickName || '微信用户'}}</text>
+        <text class="user-score">欢迎加入房间</text>
+      </view>
+      <!-- 主题切换按钮 -->
+      <view class="theme-toggle" bindtap="toggleTheme">
+        <view class="theme-icon">
+          <view class="{{isDarkMode ? 'moon-icon' : 'sun-icon'}}"></view>
+          <!-- <text>{{isDarkMode ? '浅色' : '深色'}}</text> -->
+        </view>
+      </view>
+    </view>
+    <!-- 加入房间 -->
+    <view class="leaderboard">
+      <input class="input" placeholder="请输入邀请码" bindinput="onInputCode" />
+      <button class="join-button" bindtap="onJoinRoom">加入房间</button>
+    </view>
+  </view>
+  <!-- 全部房间列表 -->
+  <view class="room-list">
+    <view class="section-title">全部房间</view>
+    <block wx:for="{{roomList}}" wx:key="code">
+      <view class="room-item">
+        <view class="room-info">
+          <text class="room-name">{{item.name || '未命名房间'}}</text>
+          <text class="room-type">类型：{{item.type || '默认'}}</text>
+          <text class="room-users">人数：{{item.users.length}}</text>
+        </view>
+        <view class="avatar-r">
+          <view wx:if="{{item.createdBy == openid}}" class="owner-tag">房主</view>
+          <view wx:else class="member-tag">成员</view>
+          <button class="join-button" bindtap="onJoinRoomFromList" data-code="{{item.code}}" data-room="{{item}}">
+            进入
+          </button>
+        </view>
+      </view>
+    </block>
+  </view>
+  <view class="button-group">
+    <button class="checkin-button" bindtap="openCreateModal">创建房间</button>
+  </view>
+  <!-- 创建房间弹窗 -->
+  <view wx:if="{{showCreateModal}}" class="modal-overlay" catchtap="closeCreateModal">
+    <view class="modal-popup" catchtap="stopTap">
+      <view class="modal-header">创建房间</view>
+      <view class="modal-body">
+        <input placeholder="请输入房间名称" bindinput="onInputRoomName" class="input" />
+        <picker mode="selector" range="{{roomTypes}}" bindchange="onRoomTypeChange">
+          <view class="picker">{{selectedRoomType || '请选择房间类型'}}</view>
+        </picker>
+      </view>
+      <view class="modal-footer">
+        <button class="footer-on-button" bindtap="closeCreateModal">取消</button>
+        <button class="footer-button" bindtap="onCreateRoom">确认</button>
+      </view>
+    </view>
+  </view>
+</view>
+<!-- 侧边栏 -->
+<view wx:if="{{isSidebarVisible}}" class="sidebar-overlay" catchtap="closeSidebar">
+  <view class="sidebar-popup {{isRightSidebar ? 'right-sidebar' : ''}} {{sidebarAnimClass}}  {{isDarkMode ? 'dark-sidebar' : ''}}" catchtap="stopTap">
+    <view class="sidebar-header">个人中心</view>
+    <view class="sidebar-body">
+      <text>昵称：{{userInfo.nickName || '微信用户'}}</text>
+    </view>
+    <view class="sidebar-body" bindtap="navigateToProfile">
+      <text>修改资料</text>
+    </view>
+    <view class="sidebar-body" bindtap="handleLogout">
+      <text>退出登录</text>
+    </view>
+  </view>
+</view>

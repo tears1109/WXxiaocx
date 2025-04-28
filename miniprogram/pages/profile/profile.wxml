@@ -1,0 +1,41 @@
+<!-- 页面元信息 -->
+<page-meta>
+  <navigation-bar title="个人资料" front-color="{{isDarkMode ? '#ffffff' : '#000000'}}" background-color="{{isDarkMode ? '#121212' : '#ffffff'}}" />
+</page-meta>
+
+  <view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+    <!-- 主题切换按钮 -->
+    <view class="theme-toggle" bindtap="toggleTheme">
+      <view class="theme-icon">
+        <view class="{{isDarkMode ? 'moon-icon' : 'sun-icon'}}"></view>
+      </view>
+      <text>{{isDarkMode ? '浅色' : '深色'}}</text>
+    </view>
+    <!-- 头像和昵称区域 -->
+    <view class="userinfo">
+      <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <image class="avatar" src="{{avatarUrl || defaultAvatar}}" mode="aspectFill"></image>
+      </button>
+      <view class="nickname-wrapper">
+        <text class="nickname-label">昵称</text>
+        <input class="nickname-input" value="{{nickName}}" placeholder="请输入昵称" bindinput="onNicknameInput" />
+      </view>
+    </view>
+    <!-- 个人信息表单 -->
+    <view class="profile-form">
+      <!-- <view class="form-item">
+        <text class="label">手机号</text>
+        <button open-type="getPhoneNumber" bindgetphonenumber="onGetPhoneNumber" class="input">
+          {{phoneNumber || '点击获取手机号'}}
+        </button>
+      </view> -->
+      <view class="form-item">
+        <text class="label">性别</text>
+        <picker class="picker" mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
+          <view class="picker-value">{{gender}}</view>
+        </picker>
+      </view>
+    </view>
+    <!-- 保存按钮 -->
+    <button class="save-button" bindtap="onSave">保存</button>
+  </view>

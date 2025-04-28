@@ -1,0 +1,51 @@
+<view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+  <!-- 花瓣动画画布 -->
+  <canvas type="2d" id="petalsCanvas" class="petals-canvas"></canvas>
+  <!-- 主题切换按钮 -->
+  <view class="theme-toggle" bindtap="toggleTheme">
+    <view class="theme-icon">
+      <view class="{{isDarkMode ? 'moon-icon' : 'sun-icon'}}"></view>
+    </view>
+    <text>{{isDarkMode ? '浅色' : '深色'}}</text>
+  </view>
+  <!-- 标题容器与动画 -->
+  <view class="title-container">
+    <view class="title-text fade-in">微信小程序</view>
+    <view class="subtitle-text fade-in-delayed">代码开源免费</view>
+  </view>
+  <!-- 登录框淡入动画 -->
+  <view class="login-box fade-in">
+    <view class="avatar-container">
+      <image class="avatar" src="https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=0949834e659d7b0e6fa29adb5752d4cb&t=1745672829"></image>
+    </view>
+    <!-- 带呼吸效果的登录按钮 -->
+    <view class="btn-container" bindtap="handleLogin" bindtouchstart="createRipple" id="loginButton">
+      <button class="login-btn breathing-btn">微信一键登录</button>
+      <!-- 涟漪效果容器 -->
+      <view class="ripple" wx:if="{{showRipple}}" style="{{rippleStyle}}"></view>
+    </view>
+  </view>
+  <!-- 背景花瓣动画 -->
+  <view class="petals">
+    <view class="petal petal-1"></view>
+    <view class="petal petal-2"></view>
+    <view class="petal petal-3"></view>
+    <view class="petal petal-4"></view>
+    <view class="petal petal-5"></view>
+    <view class="petal petal-6"></view>
+    <view class="petal petal-7"></view>
+    <view class="petal petal-8"></view>
+    <view class="petal petal-9"></view>
+    <view class="petal petal-10"></view>
+    <view class="petal petal-11"></view>
+    <view class="petal petal-12"></view>
+    <view class="petal petal-13"></view>
+    <view class="petal petal-14"></view>
+    <view class="petal petal-15"></view>
+    <view class="petal petal-16"></view>
+    <view class="petal petal-17"></view>
+    <view class="petal petal-18"></view>
+    <view class="petal petal-19"></view>
+    <view class="petal petal-20"></view>
+  </view>
+</view>

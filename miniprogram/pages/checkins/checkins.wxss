@@ -1,0 +1,786 @@
+/* page.wxss */
+/* 浅色主题 (默认) */
+.light-mode {
+  --bg-color: #f5f6fa;
+  --card-bg: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --border-color: #f0f2f5;
+  --highlight-color: #6a11cb;
+  --highlight-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  --stats-bg: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  --card-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  --btn-shadow: 0 4rpx 12rpx rgba(106, 17, 203, 0.2);
+  --ranking-item-bg: white;
+  --ranking-item-self: rgba(106, 17, 203, 0.05);
+  --rank-number-bg: #f8f9fd;
+  --modal-overlay: rgba(0, 0, 0, 0.4);
+}
+
+/* 深色主题 */
+.dark-mode {
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #808080;
+  --border-color: #333333;
+  --highlight-color: #8a11cb;
+  --highlight-gradient: linear-gradient(135deg, #8a11cb 0%, #3585fc 100%);
+  --stats-bg: linear-gradient(135deg, #8a11cb 0%, #3585fc 100%);
+  --card-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+  --btn-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.4);
+  --ranking-item-bg: #2a2a2a;
+  --ranking-item-self: rgba(106, 17, 203, 0.15);
+  --rank-number-bg: #333333;
+  --modal-overlay: rgba(0, 0, 0, 0.7);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding: 24rpx;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+/* 主题切换按钮 */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.theme-icon {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: var(--highlight-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+}
+
+.sun-icon {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background-color: #ffeb3b;
+  box-shadow: 0 0 8rpx rgba(255, 235, 59, 0.8);
+}
+
+.moon-icon {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background-color: transparent;
+  box-shadow: inset 8rpx -8rpx 0 0 #ffffff;
+  transform: rotate(-30deg);
+}
+
+.theme-toggle text {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  background: var(--card-bg);
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--card-shadow);
+}
+
+.user-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  margin-right: 24rpx;
+  border: 4rpx solid rgba(106, 17, 203, 0.1);
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.user-status {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.stats {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  color: white;
+  display: flex;
+  justify-content: space-around;
+}
+
+.stats-item {
+  font-size: 14px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.checkin-button {
+  position: fixed;
+  bottom: 40rpx;
+  right: 40rpx;
+  background: var(--highlight-gradient);
+  border: none;
+  font-size: 28rpx;
+  box-shadow: var(--btn-shadow);
+  color: white;
+  padding: 20rpx 40rpx;
+  border-radius: 40rpx;
+}
+
+.checkin-button.checked {
+  background: #ccc;
+  box-shadow: none;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 20px 0 15px;
+}
+
+.checkin-list {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.checkin-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.checkin-item:last-child {
+  border-bottom: none;
+}
+
+.checkin-item.first {
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  border-radius: 8px;
+  margin: -2px;
+  padding: 14px;
+}
+
+.rank {
+  width: 24px;
+  height: 24px;
+  background: #f0f2f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  font-size: 12px;
+  color: #666;
+}
+
+.first .rank {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.name {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+}
+
+.first .name {
+  color: white;
+}
+
+.score {
+  font-size: 14px;
+  color: #666;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.first .score {
+  color: white;
+}
+
+.time {
+  font-size: 12px;
+  color: #999;
+}
+
+.first .time {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 状态颜色 */
+.checkin-item.state-0 {
+  border-left: 4px solid #ff4d4f;
+}
+
+.checkin-item.state-1 {
+  border-left: 4px solid #1890ff;
+}
+
+.checkin-item.state-2 {
+  border-left: 4px solid #52c41a;
+}
+
+.state-text {
+  font-size: 12px;
+  /* margin-left: 18px; */
+  margin-right: 18px;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+/* 状态颜色类 */
+/* 三种状态渐变色 */
+.state-error {
+  background: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%);
+  box-shadow: 0 4px 8px rgba(255, 94, 98, 0.3);
+}
+
+.state-normal {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  box-shadow: 0 4px 8px rgba(79, 172, 254, 0.3);
+}
+
+.state-success {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  box-shadow: 0 4px 8px rgba(67, 233, 123, 0.3);
+}
+
+/* 房间信息样式 */
+.room-info {
+  background: var(--card-bg);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--card-shadow);
+}
+
+.room-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+
+.room-desc {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* 统计信息样式 */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+  padding: 24rpx;
+  background: var(--stats-bg);
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--btn-shadow);
+}
+
+.stat-item {
+  text-align: center;
+  color: white;
+}
+
+.stat-value {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+/* 打卡按钮样式 */
+.checkin-btn-container {
+  margin: 40rpx 0;
+  text-align: center;
+}
+
+.checkin-btn {
+  width: 240rpx !important;
+  height: 240rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  font-size: 36rpx;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 20rpx rgba(76, 175, 80, 0.3);
+  transition: all 0.3s ease;
+}
+
+.checkin-btn.checked {
+  background: #e0e0e0;
+  box-shadow: none;
+}
+
+/* 排行榜样式 */
+.ranking-container {
+  width: 90%;
+  background: var(--card-bg);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 120rpx;
+  box-shadow: var(--card-shadow);
+  flex: 1;
+}
+
+.ranking-title-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 24rpx;
+}
+
+.ranking-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding-left: 16rpx;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.ranking-title.active {
+  border-left: 8rpx solid var(--highlight-color);
+  color: var(--highlight-color);
+}
+
+.ranking-scroll {
+  max-height: calc(100vh - 500rpx);
+  height: calc(100vh - 500rpx);
+}
+
+.ranking-list {
+  padding: 0 4rpx;
+}
+
+.ranking-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  border-radius: 12rpx;
+  background: var(--ranking-item-bg);
+  border: 2rpx solid var(--border-color);
+  transition: transform 0.2s ease;
+}
+
+.ranking-item:last-child {
+  margin-bottom: 0;
+}
+
+.ranking-item:active {
+  transform: scale(0.98);
+}
+
+.ranking-item.self {
+  background: var(--ranking-item-self);
+  border-color: rgba(106, 17, 203, 0.1);
+}
+
+.rank-number {
+  width: 48rpx;
+  height: 48rpx;
+  background: var(--rank-number-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 24rpx;
+}
+
+.checkin-details {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+}
+
+.checkin-content {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-top: 8rpx;
+}
+
+.score {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--highlight-color);
+  margin-left: auto;
+}
+
+/* 添加打卡表单样式 */
+.checkin-form {
+  background: #fff;
+  padding: 30rpx;
+  border-radius: 12rpx;
+  margin: 20rpx 0;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.form-item {
+  margin-bottom: 20rpx;
+}
+
+.content-input {
+  width: 100%;
+  height: 200rpx;
+  padding: 20rpx;
+  box-sizing: border-box;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+.duration-input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0 10px;
+  margin-top: 10px;
+  box-sizing: border-box;
+}
+
+/* 图片上传区域样式 */
+.image-upload-section {
+  margin-top: 10px;
+}
+
+.image-preview {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  margin-top: 10px;
+}
+
+.image-preview image {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.delete-image {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.upload-btn {
+  width: 100%;
+  height: 100px;
+  border: 1px dashed var(--border-color);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.upload-icon {
+  font-size: 24px;
+  color: var(--text-tertiary);
+  margin-bottom: 5px;
+}
+
+.upload-btn text:last-child {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+/* 更新打卡按钮样式 */
+.checkin-btn {
+  width: 100% !important;
+  height: 88rpx;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 20rpx rgba(76, 175, 80, 0.3);
+  transition: all 0.3s ease;
+  margin-top: 30rpx;
+}
+
+.checkin-btn:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 2rpx 10rpx rgba(76, 175, 80, 0.2);
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--modal-overlay);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  width: 80%;
+  background: var(--card-bg);
+  border-radius: 16rpx;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  padding: 24rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2rpx solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  font-size: 40rpx;
+  color: var(--text-tertiary);
+  padding: 0 16rpx;
+}
+
+.modal-body {
+  padding: 24rpx;
+}
+
+.content-input {
+  width: 100%;
+  height: 200rpx;
+  padding: 16rpx;
+  font-size: 28rpx;
+  border: 2rpx solid var(--border-color);
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+}
+
+.duration-input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 16rpx;
+  font-size: 28rpx;
+  border: 2rpx solid var(--border-color);
+  border-radius: 8rpx;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+}
+
+.modal-footer {
+  padding: 24rpx;
+  border-top: 2rpx solid var(--border-color);
+}
+
+.submit-btn {
+  background: var(--highlight-gradient);
+  color: white;
+  font-size: 28rpx;
+  padding: 20rpx 0;
+  border-radius: 8rpx;
+  text-align: center;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20rpx);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 打卡详情弹窗样式 */
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.detail-item text:first-child {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-right: 10rpx;
+}
+
+.detail-item text:last-child {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.preview-image {
+  width: 100%;
+  height: 300rpx;
+  border-radius: 8rpx;
+  margin-top: 20rpx;
+}
+
+/* 删除按钮样式 */
+.delete-btn {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  width: 32rpx;
+  height: 32rpx;
+  background: rgba(255, 0, 0, 0.8);
+  color: white;
+  border-radius: 50%;
+  font-size: 24rpx;
+  text-align: center;
+  line-height: 32rpx;
+}
+
+/* 粒子动画画布 */
+.particle-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  /* 确保在最顶层 */
+  pointer-events: none;
+  /* 使其不阻挡点击事件 */
+}
+
+/* 添加滑动淡出动画样式 */
+.slide-out {
+  animation: slideOut 0.3s ease-out forwards;
+  overflow: hidden;
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+    max-height: 200px;
+  }
+
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* 可以添加更多动画样式供未来选择 */
+.scale-out {
+  animation: scaleOut 0.3s ease-out forwards;
+}
+
+@keyframes scaleOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.flip-out {
+  animation: flipOut 0.5s ease-out forwards;
+  transform-origin: center;
+}
+
+@keyframes flipOut {
+  0% {
+    transform: perspective(400px) rotateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: perspective(400px) rotateY(90deg);
+    opacity: 0;
+  }
+}

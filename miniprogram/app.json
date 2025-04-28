@@ -1,0 +1,27 @@
+{
+  "pages": [
+    "pages/room/room",
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/punchCard/punchCard",
+    "pages/checkins/checkins",
+    "pages/profile/profile",
+    "pages/login/login"
+  ],
+  
+  "window": {
+    "backgroundColor": "#F6F6F6",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "打卡小程序",
+    "navigationBarTextStyle": "black"
+  },
+  "permission": {
+    "scope.userInfo": {
+      "desc": "用于获取用户信息实现登录"
+    }
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}
