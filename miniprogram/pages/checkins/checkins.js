@@ -23,7 +23,8 @@ Page({
     selectedDuration: '', // 存储待查看的打卡时长
     selectedImage: '', // 存储待查看的打卡图片
     itemToDelete: null, // 要删除的项目ID
-    isDarkMode: false // 主题模式：false为浅色，true为深色
+    isDarkMode: false, // 主题模式：false为浅色，true为深色
+    isSubmitting: false // 防抖标志
   },
 
   onLoad(options) {
@@ -110,6 +111,8 @@ Page({
 
   // 提交打卡
   submitCheckin() {
+    if (this.data.isSubmitting) return;
+    this.setData({ isSubmitting: true });
     const { checkinContent, duration, checkinImage } = this.data;
     
     if (!checkinContent) {
@@ -117,6 +120,7 @@ Page({
         title: '请输入打卡内容',
         icon: 'none'
       });
+      this.setData({ isSubmitting: false });
       return;
     }
 
@@ -125,6 +129,7 @@ Page({
         title: '请输入学习时长',
         icon: 'none'
       });
+      this.setData({ isSubmitting: false });
       return;
     }
 
@@ -148,6 +153,7 @@ Page({
             icon: 'none'
           });
           console.error('图片上传失败：', err);
+          this.setData({ isSubmitting: false });
         }
       });
     } else {
@@ -208,6 +214,9 @@ Page({
           icon: 'none'
         });
         console.error('打卡失败：', err);
+      },
+      complete: () => {
+        this.setData({ isSubmitting: false });
       }
     });
   },

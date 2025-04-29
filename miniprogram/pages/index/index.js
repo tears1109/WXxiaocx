@@ -136,18 +136,31 @@ Page({
           // 更新用户总分 - 从打卡记录中累加分数
           userScores[userOpenid] = (userScores[userOpenid] || 0) + (Number(checkin.score) || 0);
         });
+
+        // 更新房间中的用户数据
+        const updatedUsers = users.map(user => ({
+          ...user,
+          attempts: userAttempts[user.openid] || 0,
+          score: userScores[user.openid] || 0
+        }));
+
+        // 更新房间数据
+        await db.collection('room').doc(roomId).update({
+          data: {
+            users: updatedUsers
+          }
+        });
         
         // 处理用户数据
-        const sortedUsers = users.map(user => {
+        const sortedUsers = updatedUsers.map(user => {
           const globalInfo = userInfoMap[user.openid] || {};
           console.log(666,globalInfo.nickName);
           
           return {
             name: globalInfo.nickName || user.userName || '未知用户',
             avatarUrl: globalInfo.avatarUrl || user.avatarUrl || '',
-            // 使用从打卡记录中计算的分数，而不是room中存储的分数
-            score: userScores[user.openid] || 0,
-            attempts: userAttempts[user.openid] || 0,
+            score: user.score || 0,
+            attempts: user.attempts || 0,
             lastCheckin: user.lastCheckin,
             openid: user.openid,
             cardColor: globalInfo.cardColor || ''

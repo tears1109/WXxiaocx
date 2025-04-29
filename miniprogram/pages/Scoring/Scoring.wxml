@@ -58,7 +58,7 @@
     </view>
     <view class="leaderboard">
       <block wx:for="{{leaderboard}}" wx:key="index">
-        <view class="user-item {{index === 0 ? 'first' : ''}}" bindtap="showUserModal" data-item="{{item}}" style="background: {{item.cardColor || 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'}}">
+        <view class="user-item {{index === 0 ? 'first' : ''}}" bindtap="showUserModal" data-item="{{item}}" style="background: {{item.cardColor || ' '}}">
           <text class="rank">{{index + 1}}</text>
           <image class="avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
           <view class="user-detail">

@@ -1,10 +1,9 @@
 <!-- pages/index/index.wxml -->
 <view class="page-container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
   <view class="fixed-content">
-    
     <!-- 页面标题 -->
     <view class="page-header">
-      <text class="page-title">用户列表</text>
+      <text class="page-title">用户管理</text>
     </view>
   </view>
   <!-- 用户列表 -->
@@ -14,6 +13,10 @@
         <image class="avatar" src="{{item.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=4adae4cbdbab4ca56c55437c80ee8e14&t=1745476793'}}" mode="aspectFill"></image>
         <view class="user-detail">
           <text class="name">{{item.nickName || '微信用户'}}</text>
+          <view class="user-tags">
+            <text class="tag admin" wx:if="{{item.isAdmin}}">管理员</text>
+            <text class="tag owner" wx:if="{{item.isOwner}}">房主</text>
+          </view>
         </view>
       </view>
     </block>
@@ -38,6 +41,12 @@
         <text>卡片颜色：</text>
         <view class="color-picker">
           <view class="color-item {{selectedUser.cardColor === color ? 'active' : ''}}" wx:for="{{colorOptions}}" wx:key="*this" wx:for-item="color" style="background: {{color}}" bindtap="setUserCardColor" data-color="{{color}}"></view>
+        </view>
+      </view>
+      <view class="detail-item" wx:if="{{isOwner}}">
+        <text>管理员权限：</text>
+        <view class="admin-toggle">
+          <switch checked="{{selectedUser.isAdmin}}" bindchange="toggleAdmin" color="#4facfe" />
         </view>
       </view>
     </view>
