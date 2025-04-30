@@ -1,4 +1,5 @@
 const db = wx.cloud.database()
+const _ = db.command
 const app = getApp();
 Page({
   data: {
@@ -101,28 +102,34 @@ Page({
       if (roomRes.data) {
         const users = roomRes.data.users || [];
         
-        // 新增：从全局 users 集合拉取最新头像和昵称
+        // 从全局 users 集合拉取最新头像和昵称
         let userInfoMap = {};
         if (users.length > 0) {
-          const openids = users.map(u => u.openid);
-          const userDocs = await db.collection('users').where({
-            _openid: db.command.in(openids)
-          }).get();
-          userDocs.data.forEach(doc => {
-            userInfoMap[doc._openid] = {
-              ...doc.userInfo,
-              cardColor: doc.cardColor || ''
-            };
+          // 调用 getUsers 云函数获取用户信息
+          const userRes = await wx.cloud.callFunction({
+            name: 'getUsers'
           });
+          
+          if (userRes.result && userRes.result.code === 0) {
+            const allUsers = userRes.result.data;
+            // 创建用户信息映射
+            allUsers.forEach(user => {
+              userInfoMap[user._openid] = {
+                nickName: user.nickName,
+                avatarUrl: user.avatarUrl,
+                cardColor: user.cardColor
+              };
+            });
+          }
         }
         
-        // 处理用户数据，直接使用 room 中存储的分数和打卡次数
+        // 处理用户数据，优先使用 users 集合中的信息
         const sortedUsers = users.map(user => {
           const globalInfo = userInfoMap[user.openid] || {};
           
           return {
-            name: globalInfo.nickName || user.userName || '未知用户',
-            avatarUrl: globalInfo.avatarUrl || user.avatarUrl || '',
+            name: globalInfo.nickName || '未知用户',
+            avatarUrl: globalInfo.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg',
             score: user.score || 0,
             attempts: user.attempts || 0,
             lastCheckin: user.lastCheckin,
