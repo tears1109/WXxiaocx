@@ -1,0 +1,9 @@
+{
+  "name": "updateRoomSettings",
+  "version": "1.0.0",
+  "description": "Update room settings",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+} 

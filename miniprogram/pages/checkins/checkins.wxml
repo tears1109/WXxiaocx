@@ -33,16 +33,16 @@
   <!-- 今日打卡列表 -->
   <view class="ranking-container">
     <view class="ranking-title-container">
-      <view class="ranking-title {{currentSwiper === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0">
+      <view class="ranking-title {{activeTab === 0 ? 'active' : ''}}" bindtap="onTabChange" data-index="0">
         今日打卡榜
       </view>
-      <view class="ranking-title {{currentSwiper === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">
+      <view class="ranking-title {{activeTab === 1 ? 'active' : ''}}" bindtap="onTabChange" data-index="1">
         历史打卡榜
       </view>
     </view>
-    <swiper class="ranking-scroll" bindchange="swiperChange" current="{{currentSwiper}}">
+    <swiper class="ranking-scroll" bindchange="onTabChange" current="{{activeTab}}">
       <swiper-item>
-        <scroll-view scroll-y style="height: 100%;">
+        <scroll-view scroll-y style="height: 100%;" bindscrolltolower="onReachBottom" lower-threshold="50">
           <view class="ranking-list">
             <block wx:for="{{todayCheckins}}" wx:key="_id">
               <view id="checkin-{{item._id}}" class="ranking-item {{item.openid === currentOpenid ? 'self' : ''}} {{itemToDelete === 'checkin-'+item._id ? 'slide-out' : ''}}" bindtap="showContentModal" data-content="{{item.content}}" data-duration="{{item.duration}}" data-image="{{item.image}}">
@@ -62,11 +62,15 @@
                 </view>
               </view>
             </block>
+            <view class="loading" wx:if="{{isLoadingMore}}">加载中...</view>
+            <view class="no-more" wx:if="{{!todayHasMore && todayCheckins.length > 0}}">
+              没有更多数据了
+            </view>
           </view>
         </scroll-view>
       </swiper-item>
       <swiper-item>
-        <scroll-view scroll-y style="height: 100%;">
+        <scroll-view scroll-y style="height: 100%;" bindscrolltolower="onReachBottom" lower-threshold="50">
           <view class="ranking-list">
             <block wx:for="{{historyCheckins}}" wx:key="_id">
               <view id="checkin-{{item._id}}" class="ranking-item {{item.openid === currentOpenid ? 'self' : ''}} {{itemToDelete === 'checkin-'+item._id ? 'slide-out' : ''}}" bindtap="showContentModal" data-content="{{item.content}}" data-duration="{{item.duration}}" data-image="{{item.image}}">
@@ -86,6 +90,10 @@
                 </view>
               </view>
             </block>
+            <view class="loading" wx:if="{{isLoadingMore}}">加载中...</view>
+            <view class="no-more" wx:if="{{!historyHasMore && historyCheckins.length > 0}}">
+              没有更多数据了
+            </view>
           </view>
         </scroll-view>
       </swiper-item>
@@ -143,4 +151,5 @@
       </view>
     </view>
   </view>
+
 </view>

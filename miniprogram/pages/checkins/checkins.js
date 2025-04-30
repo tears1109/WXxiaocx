@@ -7,7 +7,7 @@ Page({
     userInfo: null,
     todayCheckins: [], // 今日打卡用户列表
     historyCheckins: [], // 历史打卡用户列表
-    currentSwiper: 0, // 当前swiper索引
+    activeTab: 0, // 当前激活的标签页：0-今日打卡，1-历史打卡
     roomInfo: null,    // 房间信息
     roomId: '', // 房间ID
     stats: {
@@ -24,7 +24,12 @@ Page({
     selectedImage: '', // 存储待查看的打卡图片
     itemToDelete: null, // 要删除的项目ID
     isDarkMode: false, // 主题模式：false为浅色，true为深色
-    isSubmitting: false // 防抖标志
+    isSubmitting: false, // 防抖标志
+    todayPage: 1, // 今日打卡页码
+    historyPage: 1, // 历史打卡页码
+    todayHasMore: true, // 今日打卡是否还有更多
+    historyHasMore: true, // 历史打卡是否还有更多
+    isLoadingMore: false // 是否正在加载更多
   },
 
   onLoad(options) {
@@ -190,21 +195,17 @@ Page({
           duration: '',
           checkinImage: ''
         });
-        // 更新房间用户分数
-        const updateScorePromise = score ? this.updateRoomUserScore(score) : Promise.resolve();
         // 刷新打卡列表
         this.loadTodayCheckins();
-        // 完成分数更新后，返回首页并刷新排行榜
-        updateScorePromise.then(() => {
-          wx.navigateBack({
-            success: () => {
-              const pages = getCurrentPages();
-              const prevPage = pages[pages.length - 1];
-              if (prevPage && prevPage.loadRoomData) {
-                prevPage.loadRoomData(prevPage.data.roomId);
-              }
+        // 返回首页并刷新排行榜
+        wx.navigateBack({
+          success: () => {
+            const pages = getCurrentPages();
+            const prevPage = pages[pages.length - 1];
+            if (prevPage && prevPage.loadRoomData) {
+              prevPage.loadRoomData(prevPage.data.roomId);
             }
-          });
+          }
         });
       },
       fail: err => {
@@ -261,31 +262,39 @@ Page({
   },
 
   // 加载今日打卡数据
-  async loadTodayCheckins() {
+  async loadTodayCheckins(isLoadMore = false) {
     if (!this.data.roomId) return;
+    if (isLoadMore && !this.data.todayHasMore) return;
+    if (this.data.isLoadingMore) return;
 
+    this.setData({ isLoadingMore: true });
     try {
       const res = await wx.cloud.callFunction({
         name: 'getTodayCheckins',
         data: {
           openid: app.globalData.openid,
-          roomId: this.data.roomId
+          roomId: this.data.roomId,
+          page: isLoadMore ? this.data.todayPage + 1 : 1,
+          pageSize: 20
         }
       });
 
       if (res.result.success) {
+        const newCheckins = res.result.checkins;
         // 按分数降序排序
-        const sortedCheckins = res.result.checkins.sort((a, b) => b.score - a.score);
+        const sortedCheckins = newCheckins.sort((a, b) => b.score - a.score);
         
         // 计算统计数据
         const stats = {
-          todayUsers: sortedCheckins.length,
+          todayUsers: res.result.total,
           totalScore: sortedCheckins.reduce((sum, user) => sum + user.score, 0)
         };
 
         this.setData({
-          todayCheckins: sortedCheckins,
-          stats
+          todayCheckins: isLoadMore ? [...this.data.todayCheckins, ...sortedCheckins] : sortedCheckins,
+          stats,
+          todayPage: isLoadMore ? this.data.todayPage + 1 : 1,
+          todayHasMore: res.result.hasMore
         });
       }
     } catch (err) {
@@ -294,6 +303,8 @@ Page({
         title: '获取数据失败',
         icon: 'none'
       });
+    } finally {
+      this.setData({ isLoadingMore: false });
     }
   },
 
@@ -440,21 +451,28 @@ Page({
   },
 
   // 加载历史打卡数据
-  async loadHistoryCheckins() {
+  async loadHistoryCheckins(isLoadMore = false) {
     if (!this.data.roomId) return;
+    if (isLoadMore && !this.data.historyHasMore) return;
+    if (this.data.isLoadingMore) return;
 
+    this.setData({ isLoadingMore: true });
     try {
       const res = await wx.cloud.callFunction({
         name: 'getHistoryCheckins',
         data: {
           openid: app.globalData.openid,
-          roomId: this.data.roomId
+          roomId: this.data.roomId,
+          page: isLoadMore ? this.data.historyPage + 1 : 1,
+          pageSize: 20
         }
       });
 
-      if (res.result && res.result.data) {
+      if (res.result && res.result.success) {
         this.setData({
-          historyCheckins: res.result.data
+          historyCheckins: isLoadMore ? [...this.data.historyCheckins, ...res.result.data] : res.result.data,
+          historyPage: isLoadMore ? this.data.historyPage + 1 : 1,
+          historyHasMore: res.result.hasMore
         });
       }
     } catch (err) {
@@ -463,26 +481,18 @@ Page({
         title: '获取历史数据失败',
         icon: 'none'
       });
+    } finally {
+      this.setData({ isLoadingMore: false });
     }
   },
 
-  // 处理swiper切换
-  swiperChange(e) {
-    this.setData({
-      currentSwiper: e.detail.current
-    });
+  // 处理标签切换
+  onTabChange(e) {
+    const index = e.detail.index || e.detail.current;
+    if (typeof index === 'undefined') return;
     
-    // 如果切换到历史打卡，确保数据已加载
-    if (e.detail.current === 1 && this.data.historyCheckins.length === 0) {
-      this.loadHistoryCheckins();
-    }
-  },
-
-  // 点击标题切换tab
-  switchTab(e) {
-    const index = e.currentTarget.dataset.index;
     this.setData({
-      currentSwiper: index
+      activeTab: index
     });
     
     // 如果切换到历史打卡，确保数据已加载
@@ -533,6 +543,23 @@ Page({
         frontColor: '#000000',
         backgroundColor: '#f5f6fa'
       });
+    }
+  },
+
+  // 处理滚动到底部事件
+  onReachBottom() {
+    if (this.data.isLoadingMore) return;
+    
+    if (this.data.activeTab === 0) {
+      // 今日打卡
+      if (this.data.todayHasMore) {
+        this.loadTodayCheckins(true);
+      }
+    } else {
+      // 历史打卡
+      if (this.data.historyHasMore) {
+        this.loadHistoryCheckins(true);
+      }
     }
   },
 });

@@ -77,14 +77,15 @@ exports.main = async (event) => {
       }
     })
 
-    // 更新房间用户分数到 room 集合中
+    // 更新房间用户分数和打卡次数到 room 集合中
     const roomForUpdate = await db.collection('room').doc(roomId).get();
     const usersArray = Array.isArray(roomForUpdate.data.users) ? roomForUpdate.data.users : [];
     const userIdx = usersArray.findIndex(u => u.openid === openid);
     if (userIdx !== -1) {
       await db.collection('room').doc(roomId).update({
         data: {
-          [`users.${userIdx}.score`]: _.inc(score)
+          [`users.${userIdx}.score`]: _.inc(score),
+          [`users.${userIdx}.attempts`]: _.inc(1)
         }
       });
     }

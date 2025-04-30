@@ -19,8 +19,10 @@ async function ensureCollection(collectionName) {
   }
 }
 
-exports.main = async (event) => {
-  const { openid, roomId } = event
+exports.main = async (event, context) => {
+  const { roomId, page = 1, pageSize = 20 } = event
+  const wxContext = cloud.getWXContext()
+  const openid = wxContext.OPENID
 
   if (!roomId) {
     return {
@@ -30,32 +32,60 @@ exports.main = async (event) => {
   }
 
   try {
-    // 确保集合存在
-    await ensureCollection('checkins')
+    // 获取历史打卡记录
+    const checkins = await db.collection('checkins')
+      .where({
+        roomId: roomId
+      })
+      .orderBy('createTime', 'desc')
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .get()
 
-    // 获取今天0点的时间戳
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    // 获取所有打卡记录的用户openid
+    const openids = [...new Set(checkins.data.map(item => item.openid))]
 
-    // 查询历史打卡记录（当天以前的，按房间筛选，按积分降序）
-    const res = await db.collection('checkins').where({
-      roomId,
-      checkinTime: _.lt(today)
-    }).orderBy('score', 'desc').limit(50).get()
+    // 从users集合获取用户信息
+    const users = await db.collection('users')
+      .where({
+        _openid: db.command.in(openids)
+      })
+      .get()
 
-    // 处理返回数据
+    // 创建用户信息映射
+    const userMap = {}
+    users.data.forEach(user => {
+      userMap[user._openid] = {
+        nickName: user.userInfo.nickName,
+        avatarUrl: user.userInfo.avatarUrl
+      }
+    })
+
+    // 合并打卡记录和用户信息
+    const checkinsWithUserInfo = checkins.data.map(checkin => ({
+      ...checkin,
+      userName: userMap[checkin.openid]?.nickName || '未知用户',
+      avatarUrl: userMap[checkin.openid]?.avatarUrl || 'https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg'
+    }))
+
+    // 获取总数
+    const total = await db.collection('checkins')
+      .where({
+        roomId: roomId
+      })
+      .count()
+
     return {
       success: true,
-      data: res.data.map(item => ({
-        ...item,
-        checkinTime: formatDate(item.checkinTime)
-      }))
+      data: checkinsWithUserInfo,
+      total: total.total,
+      hasMore: checkins.data.length === pageSize
     }
-  } catch (e) {
-    console.error('获取历史打卡记录失败:', e)
+  } catch (err) {
+    console.error(err)
     return {
       success: false,
-      message: e.message || '获取历史打卡记录失败'
+      error: err
     }
   }
 }

@@ -116,45 +116,9 @@ Page({
           });
         }
         
-        // 获取该房间的所有打卡记录
-        const checkinsRes = await db.collection('checkins')
-          .where({
-            roomId: roomId
-          })
-          .get();
-        
-        const checkins = checkinsRes.data || [];
-        
-        // 统计每个用户的打卡次数和分数
-        const userAttempts = {};
-        const userScores = {};
-        
-        checkins.forEach(checkin => {
-          const userOpenid = checkin.openid;
-          // 更新打卡次数
-          userAttempts[userOpenid] = (userAttempts[userOpenid] || 0) + 1;
-          // 更新用户总分 - 从打卡记录中累加分数
-          userScores[userOpenid] = (userScores[userOpenid] || 0) + (Number(checkin.score) || 0);
-        });
-
-        // 更新房间中的用户数据
-        const updatedUsers = users.map(user => ({
-          ...user,
-          attempts: userAttempts[user.openid] || 0,
-          score: userScores[user.openid] || 0
-        }));
-
-        // 更新房间数据
-        await db.collection('room').doc(roomId).update({
-          data: {
-            users: updatedUsers
-          }
-        });
-        
-        // 处理用户数据
-        const sortedUsers = updatedUsers.map(user => {
+        // 处理用户数据，直接使用 room 中存储的分数和打卡次数
+        const sortedUsers = users.map(user => {
           const globalInfo = userInfoMap[user.openid] || {};
-          console.log(666,globalInfo.nickName);
           
           return {
             name: globalInfo.nickName || user.userName || '未知用户',
@@ -178,6 +142,10 @@ Page({
         const userRank = currentUserIndex !== -1 ? currentUserIndex + 1 : '-';
         const userScore = currentUser ? currentUser.score : 0;
 
+        // 计算总打卡次数和总分
+        const totalAttempts = users.reduce((sum, user) => sum + (user.attempts || 0), 0);
+        const totalScore = users.reduce((sum, user) => sum + (user.score || 0), 0);
+
         this.setData({
           roomInfo: roomRes.data,
           leaderboard: sortedUsers,
@@ -185,8 +153,8 @@ Page({
           userRank: userRank,
           stats: {
             users: users.length,
-            attempts: checkins.length,
-            totalScore: sortedUsers.reduce((sum, user) => sum + user.score, 0)
+            attempts: totalAttempts,
+            totalScore: totalScore
           },
           roomUser: roomUser,
           // 房主判断及初始设置
@@ -555,5 +523,53 @@ Page({
     } finally {
       wx.hideLoading();
     }
-  }
+  },
+
+  // 新增：重新统计房间数据
+  async recalculateRoomStats() {
+    if (!this.data.isOwner) {
+      wx.showToast({
+        title: '只有房主可以重新统计',
+        icon: 'none'
+      });
+      return;
+    }
+
+    wx.showModal({
+      title: '重新统计',
+      content: '确定要重新统计所有用户的打卡次数和分数吗？',
+      success: async (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '统计中...' });
+          try {
+            const result = await wx.cloud.callFunction({
+              name: 'recalculateRoomStats',
+              data: {
+                roomId: this.data.roomId
+              }
+            });
+
+            if (result.result && result.result.success) {
+              wx.showToast({
+                title: '统计完成',
+                icon: 'success'
+              });
+              // 刷新房间数据
+              this.loadRoomData(this.data.roomId);
+            } else {
+              throw new Error(result.result?.message || '统计失败');
+            }
+          } catch (err) {
+            console.error('重新统计失败:', err);
+            wx.showToast({
+              title: err.message || '统计失败',
+              icon: 'none'
+            });
+          } finally {
+            wx.hideLoading();
+          }
+        }
+      }
+    });
+  },
 });

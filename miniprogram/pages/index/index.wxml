@@ -92,6 +92,7 @@
       <button wx:if="{{settings.length < 5}}" class="add-level-button" bindtap="addLevel">
         添加等级
       </button>
+      <button class="recalculate-button" bindtap="recalculateRoomStats">重新统计</button>
     </view>
     <view class="modal-footer">
       <button class="footer-on-button" bindtap="closeSettingsModal">取消</button>

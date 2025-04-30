@@ -49,27 +49,24 @@ exports.main = async (event, context) => {
     await db.collection('checkins').doc(checkinId).remove()
     console.log('打卡记录已删除')
 
-    // 更新房间用户分数
+    // 更新房间用户分数和打卡次数
     const users = Array.isArray(room.users) ? room.users : []
     const idx = users.findIndex(u => u.openid === record.openid)
     console.log('查找用户索引', { userOpenid: record.openid, foundIndex: idx })
-    
+
     if (idx !== -1) {
-      const currentScore = users[idx].score || 0
-      console.log('用户当前分数', currentScore)
-      console.log('更新后分数将为', currentScore - scoreToSubtract)
-      
-      const updateResult = await db.collection('room').doc(roomId).update({ 
-        data: { [`users.${idx}.score`]: _.inc(-scoreToSubtract) } 
+      await db.collection('room').doc(roomId).update({
+        data: {
+          [`users.${idx}.score`]: _.inc(-scoreToSubtract),
+          [`users.${idx}.attempts`]: _.inc(-1)
+        }
       })
-      console.log('分数更新结果', updateResult)
-    } else {
-      console.log('错误: 未找到用户', { openid: record.openid, users: users })
+      console.log('已更新用户分数和打卡次数')
     }
 
-    return { success: true }
+    return { success: true, message: '删除成功' }
   } catch (err) {
-    console.error('删除打卡失败：', err)
-    return { success: false, message: err.message || '删除打卡失败' }
+    console.error('删除打卡记录失败:', err)
+    return { success: false, message: err.message || '删除失败' }
   }
 } 

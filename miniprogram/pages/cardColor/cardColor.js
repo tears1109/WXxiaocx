@@ -567,10 +567,7 @@ Page({
     try {
       wx.showLoading({ title: '加载中...' });
       const res = await wx.cloud.callFunction({
-        name: 'getUsers',
-        data: {
-          roomId: this.data.roomId  // 传入房间ID
-        }
+        name: 'getUsers'
       });
       
       console.log('云函数返回结果:', res);

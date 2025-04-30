@@ -630,3 +630,27 @@
   transform: scale(1.1);
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
 }
+
+.recalculate-button {
+  margin-top: 20rpx;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 10rpx 20rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.recalculate-button:active {
+  background-color: #e0e0e0;
+}
+
+.dark-mode .recalculate-button {
+  background-color: #333;
+  color: #fff;
+  border-color: #444;
+}
+
+.dark-mode .recalculate-button:active {
+  background-color: #444;
+}
