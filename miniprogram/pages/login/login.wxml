@@ -1,6 +1,6 @@
 <view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
   <!-- 花瓣动画画布 -->
-  <canvas type="2d" id="petalsCanvas" class="petals-canvas"></canvas>
+<canvas type="2d" id="petalsCanvas" class="petals-canvas"></canvas  >
   <!-- 主题切换按钮 -->
   <view class="theme-toggle" bindtap="toggleTheme">
     <view class="theme-icon">
@@ -14,7 +14,7 @@
     <view class="subtitle-text fade-in-delayed">昨夜闲潭梦落花</view>
   </view>
   <!-- 登录框淡入动画 -->
-  <view class="login-box fade-in">
+  <view class="login-box {{isLoginFading ? 'fade-out' : ''}}">
     <view class="avatar-container">
       <image class="avatar" src="https://6c6f-loong-9g5c3upyfdd12980-1323550512.tcb.qcloud.la/default-avatar.jpg?sign=0949834e659d7b0e6fa29adb5752d4cb&t=1745672829"></image>
     </view>
@@ -26,7 +26,7 @@
     </view>
   </view>
   <!-- 背景花瓣动画 -->
-  <view class="petals">
+  <view class="petals {{isAccelerating ? 'accelerate' : ''}}">
     <view class="petal petal-1"></view>
     <view class="petal petal-2"></view>
     <view class="petal petal-3"></view>
@@ -47,5 +47,17 @@
     <view class="petal petal-18"></view>
     <view class="petal petal-19"></view>
     <view class="petal petal-20"></view>
+  </view>
+  <!-- 登录加载动画 -->
+  <view class="loading-container" wx:if="{{showLoading}}">
+    <view class="loading-content">
+      <view class="loading-ring"></view>
+      <view class="loading-ring"></view>
+      <view class="loading-ring"></view>
+    </view>
+    <view class="loading-text">
+      {{loadingText || '登录中'}}
+      <text class="loading-dots"></text>
+    </view>
   </view>
 </view>

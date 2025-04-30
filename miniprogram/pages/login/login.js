@@ -21,7 +21,11 @@ Page({
     particles: [],
     animationComplete: false,
     loginBoxAnimation: null,
-    isDarkMode: false // 主题模式：false为浅色，true为深色
+    isDarkMode: false, // 主题模式：false为浅色，true为深色
+    showLoading: false,
+    loadingText: '',
+    isAccelerating: false,
+    isLoginFading: false
   },
 
   onLoad() {
@@ -210,14 +214,7 @@ Page({
       return;
     }
     
-    // 显示加载指示器
-    wx.showLoading({
-      title: '登录中...',
-      mask: true
-    });
-    
-    // 设置加载状态
-    this.setData({ loading: true });
+
     
     const loginAttempt = (retry = false) => {
       app.loginWithWeixin()
@@ -228,23 +225,16 @@ Page({
           // 将用户信息设置到全局数据
           app.globalData.userInfo = userInfo;
           app.globalData.openid = openid;
-          
-          // 隐藏加载并显示成功消息
-          wx.hideLoading();
-          wx.showToast({
-            title: '登录成功',
-            icon: 'success'
+              // 设置加载状态并加速花瓣动画
+          this.setData({ 
+            loading: true,
+            showLoading: true,
+            isAccelerating: true
           });
-          
-          // 创建退出动画
-          const exitAnimation = wx.createAnimation({
-            duration: 800,
-            timingFunction: 'ease-out'
-          });
-          
-          exitAnimation.opacity(0).scale(1.2).step();
-          this.setData({
-            loginBoxAnimation: exitAnimation.export()
+          // 隐藏加载动画并开始登录模块淡出
+          this.setData({ 
+            showLoading: false,
+            isLoginFading: true
           });
           
           // 动画完成后导航到主页
@@ -256,16 +246,22 @@ Page({
         })
         .catch(err => {
           console.error('登录失败:', err);
-          wx.hideLoading();
+          
+          // 隐藏加载动画并恢复花瓣速度
+          this.setData({ 
+            showLoading: false,
+            isAccelerating: false,
+            isLoginFading: false
+          });
           
           // 如果是云开发未初始化的错误且没有重试过，则尝试一次重试
           if (!retry && (String(err).includes('云开发未初始化') || String(err).includes('cloud not initialized'))) {
             console.log('正在尝试重新初始化云环境并重试登录...');
             
-            wx.showToast({
-              title: '正在重试...',
-              icon: 'loading',
-              duration: 2000
+            // 显示重试动画
+            this.setData({ 
+              showLoading: true,
+              loadingText: '正在重试'
             });
             
             // 延迟1秒后重试
@@ -321,6 +317,7 @@ Page({
         }
         
         // 动画循环
+        const self = this;
         function animate() {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           
@@ -337,10 +334,11 @@ Page({
             ctx.fill();
             ctx.restore();
             
-            // 更新位置
-            petal.x += petal.speedX;
-            petal.y += petal.speedY;
-            petal.rotate += 0.5;
+            // 根据登录状态调整速度
+            const speedMultiplier = self.data.isAccelerating ? 10 : 1;
+            petal.x += petal.speedX * speedMultiplier;
+            petal.y += petal.speedY * speedMultiplier;
+            petal.rotate += self.data.isAccelerating ? 2 : 0.5;
             
             // 如果超出屏幕则重置
             if (petal.y > canvas.height) {

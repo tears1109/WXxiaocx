@@ -667,3 +667,163 @@
     opacity: 0;
   }
 }
+
+/* 登录加载动画 */
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.loading-content {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4rpx solid transparent;
+  border-top-color: var(--highlight-color);
+  animation: spin 1s linear infinite;
+}
+
+.loading-ring:nth-child(2) {
+  border-top-color: var(--highlight-gradient);
+  animation-delay: 0.2s;
+  transform: scale(0.8);
+}
+
+.loading-ring:nth-child(3) {
+  border-top-color: #fff;
+  animation-delay: 0.4s;
+  transform: scale(0.6);
+}
+
+.loading-text {
+  color: #fff;
+  font-size: 32rpx;
+  margin-top: 40rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.loading-dots {
+  display: inline-block;
+  animation: dots 1.5s infinite;
+}
+
+.loading-dots::after {
+  content: '...';
+  animation: dots 1.5s infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes dots {
+
+  0%,
+  20% {
+    content: '.';
+  }
+
+  40% {
+    content: '..';
+  }
+
+  60%,
+  100% {
+    content: '...';
+  }
+}
+
+/* 花瓣动画加速效果 */
+.petals.accelerate .petal {
+  animation-duration: 0.5s !important;
+}
+
+.petals.accelerate .petal-1,
+.petals.accelerate .petal-5,
+.petals.accelerate .petal-9,
+.petals.accelerate .petal-13,
+.petals.accelerate .petal-17 {
+  animation-duration: 0.4s !important;
+}
+
+.petals.accelerate .petal-2,
+.petals.accelerate .petal-6,
+.petals.accelerate .petal-10,
+.petals.accelerate .petal-14,
+.petals.accelerate .petal-18 {
+  animation-duration: 0.45s !important;
+}
+
+.petals.accelerate .petal-3,
+.petals.accelerate .petal-7,
+.petals.accelerate .petal-11,
+.petals.accelerate .petal-15,
+.petals.accelerate .petal-19 {
+  animation-duration: 0.5s !important;
+}
+
+.petals.accelerate .petal-4,
+.petals.accelerate .petal-8,
+.petals.accelerate .petal-12,
+.petals.accelerate .petal-16,
+.petals.accelerate .petal-20 {
+  animation-duration: 0.55s !important;
+}
+
+/* 登录模块淡出动画 */
+.login-box.fade-out {
+  animation: loginFadeOut 0.8s ease-out forwards;
+}
+
+@keyframes loginFadeOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-50rpx);
+  }
+}
